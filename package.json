@@ -14,7 +14,8 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "db:push": "dotenv -e .env.local -- drizzle-kit push",
-    "import:sheet": "dotenv -e .env.local -- tsx scripts/import-sheet.ts"
+    "import:sheet": "dotenv -e .env.local -- tsx scripts/import-sheet.ts",
+    "resync:tracking": "dotenv -e .env.local -- tsx scripts/resync-tracking.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
