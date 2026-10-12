@@ -1,0 +1,10 @@
+# Not a workspace — a single app. This file exists because pnpm 11 reads
+# `allowBuilds` from here and FAILS the install (ERR_PNPM_IGNORED_BUILDS) for
+# any dependency with an install script that is not named, `false` included.
+#
+# `false` is the default answer: an install script runs arbitrary code from a
+# transitive dependency. Only what genuinely cannot run without one gets `true`.
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false

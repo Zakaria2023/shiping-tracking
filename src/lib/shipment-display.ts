@@ -1,0 +1,32 @@
+import { CARRIER_LABELS } from "@/db/label";
+import { SelectShipments } from "@/db/schema/shipments";
+
+/** Browser-safe helpers for naming a shipment on screen. */
+
+export const shipmentTitle = (
+  shipment: Pick<SelectShipments, "trackingNumber" | "vesselName">,
+): string => shipment.trackingNumber || shipment.vesselName || "Shipment";
+
+export const carrierLabel = (
+  shipment: Pick<SelectShipments, "carrier" | "carrierName">,
+): string =>
+  shipment.carrier === "other" && shipment.carrierName
+    ? shipment.carrierName
+    : CARRIER_LABELS[shipment.carrier];
+
+/** "2 × 40 ft" from the count and size columns. */
+export const containerSummary = (
+  shipment: Pick<SelectShipments, "containerCount" | "containerSize">,
+): string => {
+  if (!shipment.containerCount) {
+    return "";
+  }
+  return shipment.containerSize
+    ? `${shipment.containerCount} × ${shipment.containerSize} ft`
+    : `${shipment.containerCount} containers`;
+};
+
+const WEIGHT_FORMAT = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
+
+export const formatWeight = (value: string | null): string =>
+  value ? `${WEIGHT_FORMAT.format(Number(value))} kg` : "";

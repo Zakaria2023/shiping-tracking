@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Shipment Tracking: MSC capture",
+  "version": "1.0.0",
+  "description": "When an MSC tracking page is open, sends its result to the Shipment Tracking app.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.msc.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.msc.com/*"],
+      "js": ["intercept.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://www.msc.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "Shipment Tracking: MSC capture"
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "IsSuccess": true,
+  "Data": {
+    "TrackingType": "Booking Number",
+    "TrackingTitle": "BOOKING NUMBER:",
+    "TrackingNumber": "177TDFDFS902229",
+    "CurrentDate": "12/10/2026",
+    "PriceCalculationLabel": "* Price calculation date is indicative. Please contact your local MSC office to verify this information.",
+    "TrackingResultsLabel": "Tracking results provided by MSC on 12.10.2026 at 15:49 Central Europe Standard Time",
+    "BillOfLadings": [
+      {
+        "BillOfLadingNumber": "MEDUABR70013",
+        "NumberOfContainers": 2,
+        "GeneralTrackingInfo": {
+          "ShippedFrom": "SHANGHAI, CN",
+          "ShippedTo": "BEIRUT, LB",
+          "PortOfLoad": "SHANGHAI, CN",
+          "PortOfDischarge": "BEIRUT, LB",
+          "Transshipments": ["SINGAPORE, SG", "GIOIA TAURO, IT"],
+          "PriceCalculationDate": "27/08/2026",
+          "FinalPodEtaDate": "09/11/2026"
+        },
+        "ContainersInfo": [
+          {
+            "Events": [
+              {
+                "Order": 7,
+                "Date": "09/11/2026",
+                "Location": "BEIRUT, LB",
+                "UnLocationCode": "LBBEY",
+                "Description": "Estimated Time of Arrival",
+                "Detail": ["MSC BRITTANY", "NL643R"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "CMA BEIRUT TERMINAL SAL", "Smdg": "BCTC" },
+                "Vessel": { "IMO": "9724049", "Built": "2016", "Flag": "PT", "FlagName": "PORTUGAL" },
+                "IntermediaryPortCalls": [
+                  { "LocationName": "LIMASSOL", "Country": "CY", "Etd": "09/11/2026 00:00", "Eta": "08/11/2026 00:00" },
+                  { "LocationName": "ALEXANDRIA EL DEKHEILA", "Country": "EG", "Etd": "07/11/2026 04:00", "Eta": "05/11/2026 04:00" },
+                  { "LocationName": "GIOIA TAURO", "Country": "IT", "Etd": "02/11/2026 23:00", "Eta": "01/11/2026 23:00" }
+                ]
+              },
+              {
+                "Order": 6,
+                "Date": "29/10/2026",
+                "Location": "VALENCIA, ES",
+                "UnLocationCode": "ESVLC",
+                "Description": "Full Intended Transshipment",
+                "Detail": ["MSC BRITTANY", "NL640A"],
+                "EquipmentHandling": null,
+                "Vessel": { "IMO": "9724049", "Built": "2016", "Flag": "PT", "FlagName": "PORTUGAL" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 5,
+                "Date": "25/10/2026",
+                "Location": "VALENCIA, ES",
+                "UnLocationCode": "ESVLC",
+                "Description": "Estimated Time of Arrival",
+                "Detail": ["ZEAL LUMOS", "018E"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "CSP IBERIAN VALENCIA TERMINAL", "Smdg": "NOATV" },
+                "Vessel": { "IMO": "9864241", "Built": "2021", "Flag": "GB", "FlagName": "UNITED KINGDOM" },
+                "IntermediaryPortCalls": [
+                  { "LocationName": "TANGER MED", "Country": "MA", "Etd": "24/10/2026 08:00", "Eta": "23/10/2026 07:00" }
+                ]
+              },
+              {
+                "Order": 4,
+                "Date": "27/09/2026",
+                "Location": "SINGAPORE, SG",
+                "UnLocationCode": "SGSIN",
+                "Description": "Full Transshipment Loaded",
+                "Detail": ["ZEAL LUMOS", "017W"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "TUAS TERMINAL", "Smdg": "PSATUA" },
+                "Vessel": { "IMO": "9864241", "Built": "2021", "Flag": "GB", "FlagName": "UNITED KINGDOM" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 3,
+                "Date": "23/09/2026",
+                "Location": "SINGAPORE, SG",
+                "UnLocationCode": "SGSIN",
+                "Description": "Full Transshipment Discharged",
+                "Detail": ["AMERICA", "FD636W"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "TUAS TERMINAL", "Smdg": "PSATUA" },
+                "Vessel": { "IMO": "9285990", "Built": "2004", "Flag": "CY", "FlagName": "CYPRUS" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 2,
+                "Date": "12/09/2026",
+                "Location": "SHANGHAI, CN",
+                "UnLocationCode": "CNSHA",
+                "Description": "Export Loaded on Vessel",
+                "Detail": ["AMERICA", "FD636W"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "SHANGHAI GUANDONG INTERNATIONAL CONTAINER TERMINAL CO.,LTD", "Smdg": "SGICT" },
+                "Vessel": { "IMO": "9285990", "Built": "2004", "Flag": "CY", "FlagName": "CYPRUS" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 1,
+                "Date": "04/09/2026",
+                "Location": "SHANGHAI, CN",
+                "UnLocationCode": "CNSHA",
+                "Description": "Export received at CY",
+                "Detail": ["LADEN"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "SHANGHAI GUANDONG INTERNATIONAL CONTAINER TERMINAL CO.,LTD", "Smdg": "SGICT" },
+                "Vessel": { "IMO": "", "Built": "", "Flag": "", "FlagName": "" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 0,
+                "Date": "30/08/2026",
+                "Location": "SHANGHAI, CN",
+                "UnLocationCode": "CNSHA",
+                "Description": "Empty to Shipper",
+                "Detail": ["EMPTY"],
+                "EquipmentHandling": { "Bic": "CNSHAMRBO", "CodeType": null, "Code": "", "Name": "TONGSHENG MEDITERRANEAN DEPOT", "Smdg": null },
+                "Vessel": { "IMO": "", "Built": "", "Flag": "", "FlagName": "" },
+                "IntermediaryPortCalls": null
+              }
+            ],
+            "Delivered": false,
+            "ContainerNumber": "MSBU1355271",
+            "PodEtaDate": "09/11/2026",
+            "ContainerType": "20' DRY VAN",
+            "LatestMove": "SINGAPORE, SG"
+          },
+          {
+            "Events": [
+              {
+                "Order": 7,
+                "Date": "09/11/2026",
+                "Location": "BEIRUT, LB",
+                "UnLocationCode": "LBBEY",
+                "Description": "Estimated Time of Arrival",
+                "Detail": ["MSC BRITTANY", "NL643R"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "CMA BEIRUT TERMINAL SAL", "Smdg": "BCTC" },
+                "Vessel": { "IMO": "9724049", "Built": "2016", "Flag": "PT", "FlagName": "PORTUGAL" },
+                "IntermediaryPortCalls": [
+                  { "LocationName": "LIMASSOL", "Country": "CY", "Etd": "09/11/2026 00:00", "Eta": "08/11/2026 00:00" },
+                  { "LocationName": "ALEXANDRIA EL DEKHEILA", "Country": "EG", "Etd": "07/11/2026 04:00", "Eta": "05/11/2026 04:00" },
+                  { "LocationName": "GIOIA TAURO", "Country": "IT", "Etd": "02/11/2026 23:00", "Eta": "01/11/2026 23:00" }
+                ]
+              },
+              {
+                "Order": 6,
+                "Date": "29/10/2026",
+                "Location": "VALENCIA, ES",
+                "UnLocationCode": "ESVLC",
+                "Description": "Full Intended Transshipment",
+                "Detail": ["MSC BRITTANY", "NL640A"],
+                "EquipmentHandling": null,
+                "Vessel": { "IMO": "9724049", "Built": "2016", "Flag": "PT", "FlagName": "PORTUGAL" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 5,
+                "Date": "25/10/2026",
+                "Location": "VALENCIA, ES",
+                "UnLocationCode": "ESVLC",
+                "Description": "Estimated Time of Arrival",
+                "Detail": ["ZEAL LUMOS", "018E"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "CSP IBERIAN VALENCIA TERMINAL", "Smdg": "NOATV" },
+                "Vessel": { "IMO": "9864241", "Built": "2021", "Flag": "GB", "FlagName": "UNITED KINGDOM" },
+                "IntermediaryPortCalls": [
+                  { "LocationName": "TANGER MED", "Country": "MA", "Etd": "24/10/2026 08:00", "Eta": "23/10/2026 07:00" }
+                ]
+              },
+              {
+                "Order": 4,
+                "Date": "27/09/2026",
+                "Location": "SINGAPORE, SG",
+                "UnLocationCode": "SGSIN",
+                "Description": "Full Transshipment Loaded",
+                "Detail": ["ZEAL LUMOS", "017W"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "TUAS TERMINAL", "Smdg": "PSATUA" },
+                "Vessel": { "IMO": "9864241", "Built": "2021", "Flag": "GB", "FlagName": "UNITED KINGDOM" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 3,
+                "Date": "23/09/2026",
+                "Location": "SINGAPORE, SG",
+                "UnLocationCode": "SGSIN",
+                "Description": "Full Transshipment Discharged",
+                "Detail": ["AMERICA", "FD636W"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "TUAS TERMINAL", "Smdg": "PSATUA" },
+                "Vessel": { "IMO": "9285990", "Built": "2004", "Flag": "CY", "FlagName": "CYPRUS" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 2,
+                "Date": "13/09/2026",
+                "Location": "SHANGHAI, CN",
+                "UnLocationCode": "CNSHA",
+                "Description": "Export Loaded on Vessel",
+                "Detail": ["AMERICA", "FD636W"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "SHANGHAI GUANDONG INTERNATIONAL CONTAINER TERMINAL CO.,LTD", "Smdg": "SGICT" },
+                "Vessel": { "IMO": "9285990", "Built": "2004", "Flag": "CY", "FlagName": "CYPRUS" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 1,
+                "Date": "04/09/2026",
+                "Location": "SHANGHAI, CN",
+                "UnLocationCode": "CNSHA",
+                "Description": "Export received at CY",
+                "Detail": ["LADEN"],
+                "EquipmentHandling": { "Bic": null, "CodeType": null, "Code": "", "Name": "SHANGHAI GUANDONG INTERNATIONAL CONTAINER TERMINAL CO.,LTD", "Smdg": "SGICT" },
+                "Vessel": { "IMO": "", "Built": "", "Flag": "", "FlagName": "" },
+                "IntermediaryPortCalls": null
+              },
+              {
+                "Order": 0,
+                "Date": "30/08/2026",
+                "Location": "SHANGHAI, CN",
+                "UnLocationCode": "CNSHA",
+                "Description": "Empty to Shipper",
+                "Detail": ["EMPTY"],
+                "EquipmentHandling": { "Bic": "CNSHAMRBO", "CodeType": null, "Code": "", "Name": "TONGSHENG MEDITERRANEAN DEPOT", "Smdg": null },
+                "Vessel": { "IMO": "", "Built": "", "Flag": "", "FlagName": "" },
+                "IntermediaryPortCalls": null
+              }
+            ],
+            "Delivered": false,
+            "ContainerNumber": "TEMU4514805",
+            "PodEtaDate": "09/11/2026",
+            "ContainerType": "20' DRY VAN",
+            "LatestMove": "SINGAPORE, SG"
+          }
+        ],
+        "Delivered": false
+      }
+    ],
+    "ShowSubscriptionBanner": true
+  }
+}

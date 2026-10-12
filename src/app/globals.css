@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* Fonts come from next/font (see app/layout.tsx), self-hosted from files in
+   the repo so a build never depends on a font download. */
+@theme inline {
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+@theme {
+  /* Deep sea blue for the one emphatic colour, a teal accent for "arrived". */
+  --color-primary: #0b5fa5;
+  --color-primary-hover: #094d86;
+  --color-primary-tint: #e8f1fb;
+  --color-primary-tint-border: #cfe0f3;
+
+  --color-accent: #0f8b7d;
+
+  --color-ink: #142033;
+  --color-muted: #5b6b80;
+  --color-faint: #93a1b4;
+
+  --color-page: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-overlay: #ffffff;
+  --color-hairline: #e3e8ef;
+  --color-hairline-soft: #edf1f6;
+  --color-hover: #f7f9fc;
+  --color-scrim: rgba(0, 0, 0, 0.5);
+
+  /* One colour per status, each with a tint for its pill. */
+  --color-pending: #b45309;
+  --color-pending-tint: #fdf3e3;
+  --color-sailing: #0b5fa5;
+  --color-sailing-tint: #e8f1fb;
+  --color-arrived: #0f8b7d;
+  --color-arrived-tint: #e6f5f2;
+  --color-delivered: #2f7a3e;
+  --color-delivered-tint: #e9f4ec;
+
+  --color-danger: #c62828;
+  --color-danger-tint: #fdeaea;
+
+  --radius-card: 14px;
+  --radius-control: 10px;
+
+  --animate-fade-in: fade-in 0.15s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Numbers line up in tables when they share a width per digit. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}

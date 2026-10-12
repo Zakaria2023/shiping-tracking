@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Shipment Tracking: MSC capture</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 520px;
+        margin: 40px auto;
+        color: #142033;
+      }
+      label {
+        display: block;
+        font-size: 14px;
+        color: #5b6b80;
+        margin: 16px 0 6px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px 10px;
+        border: 1px solid #e3e8ef;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+      button {
+        margin-top: 20px;
+        padding: 8px 16px;
+        border: 0;
+        border-radius: 10px;
+        background: #0b5fa5;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      #saved {
+        margin-inline-start: 12px;
+        font-size: 14px;
+        color: #5b6b80;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="font-size: 20px; font-weight: 500">MSC capture settings</h1>
+    <p style="font-size: 14px; color: #5b6b80">
+      Where the app runs, and the token from its <code>.env.local</code>
+      (<code>TRACKING_INGEST_TOKEN</code>).
+    </p>
+    <label for="appUrl">App URL</label>
+    <input id="appUrl" placeholder="http://localhost:3010" />
+    <label for="token">Ingest token</label>
+    <input id="token" placeholder="tr_ingest_…" />
+    <button id="save">Save</button>
+    <span id="saved"></span>
+    <script src="options.js"></script>
+  </body>
+</html>
