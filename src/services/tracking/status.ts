@@ -7,8 +7,11 @@ import { CarrierSnapshot, SnapshotEvent } from "./types";
  * arrived / delivered. Pure, so it is tested against the saved samples.
  *
  * - delivered: the carrier says so, or every box has been delivered.
- * - arrived: a real (not estimated) arrival, discharge or berthing at the port
- *   of discharge, or at the final destination.
+ * - arrived: a real (not estimated) arrival, discharge or berthing at the
+ *   final destination. When the carrier names a delivery place beyond the
+ *   port of discharge (Yang Ming: discharge Damietta, delivery El Dekheila),
+ *   reaching the port of discharge is not arrival: the boxes are still on a
+ *   feeder, and the carrier's own ETA is for the delivery place.
  * - sailing: a real departure or "loaded on vessel".
  * - pending: nothing has left yet.
  */
@@ -20,9 +23,12 @@ const DELIVERED_PATTERN = /delivered to consignee|empty.*return|gate out|full ou
 const actualEvents = (snapshot: CarrierSnapshot): SnapshotEvent[] =>
   snapshot.events.filter((event) => !event.isEstimated);
 
-const atDischarge = (snapshot: CarrierSnapshot, event: SnapshotEvent): boolean =>
-  samePlace(event.location, snapshot.portOfDischarge) ||
-  samePlace(event.location, snapshot.placeOfDelivery);
+/** Where the shipment counts as arrived: the delivery place if the carrier names one, else the discharge port. */
+const finalPlace = (snapshot: CarrierSnapshot): string | null =>
+  snapshot.placeOfDelivery ?? snapshot.portOfDischarge;
+
+const atFinalPlace = (snapshot: CarrierSnapshot, event: SnapshotEvent): boolean =>
+  samePlace(event.location, finalPlace(snapshot));
 
 export const deriveStatus = (snapshot: CarrierSnapshot): ShipmentStatus => {
   const actual = actualEvents(snapshot);
@@ -34,7 +40,7 @@ export const deriveStatus = (snapshot: CarrierSnapshot): ShipmentStatus => {
   const arrived = actual.some(
     (event) =>
       event.description === "Arrival at final destination" ||
-      (ARRIVAL_PATTERN.test(event.description) && atDischarge(snapshot, event)),
+      (ARRIVAL_PATTERN.test(event.description) && atFinalPlace(snapshot, event)),
   );
   if (arrived) {
     return "arrived";

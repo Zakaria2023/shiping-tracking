@@ -32,10 +32,21 @@ describe("Yang Ming parser", () => {
     expect(snapshot.containers).toHaveLength(5);
   });
 
-  it("has arrived at the discharge port, with the goods on a feeder onward", () => {
+  it("is still sailing: at the discharge port, but delivery is a feeder leg away", () => {
     const snapshot = yangMing();
-    expect(deriveStatus(snapshot)).toBe("arrived");
+    expect(deriveStatus(snapshot)).toBe("sailing");
     expect(latestActualEvent(snapshot)?.location).toMatch(/DAMIETTA/);
+  });
+
+  it("arrives once the final destination leg is actual", () => {
+    const snapshot = yangMing();
+    const arrived = {
+      ...snapshot,
+      events: snapshot.events.map((event) =>
+        event.description === "Arrival at final destination" ? { ...event, isEstimated: false } : event,
+      ),
+    };
+    expect(deriveStatus(arrived)).toBe("arrived");
   });
 });
 
@@ -104,6 +115,20 @@ describe("deriveStatus", () => {
         events: [
           event("Export Loaded on Vessel", "SHANGHAI, CN"),
           event("Estimated Time of Arrival", "BEIRUT, LB", true),
+        ],
+      }),
+    ).toBe("sailing");
+  });
+
+  it("a discharge at the port of discharge is not arrival when delivery is further on", () => {
+    expect(
+      deriveStatus({
+        ...base,
+        placeOfDelivery: "EL DEKHEILA PORT-PUBLIC TML (EGEDK)",
+        portOfDischarge: "DAMIETTA (EGDAM)",
+        events: [
+          event("Vessel departure", "KAOHSIUNG"),
+          event("Vessel arrival", "DAMIETTA"),
         ],
       }),
     ).toBe("sailing");

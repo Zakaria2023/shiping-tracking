@@ -22,7 +22,8 @@ const fingerprintOf = (event: SnapshotEvent): string =>
         event.containerNumber ?? "",
         event.description,
         event.occurredAt.toISOString(),
-        event.location,
+        // Not the place text: the same event re-read after a change in how a
+        // place name is trimmed must still be the same row.
         event.isEstimated ? "est" : "act",
       ].join("|"),
     )
