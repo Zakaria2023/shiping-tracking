@@ -30,3 +30,16 @@ const WEIGHT_FORMAT = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 
 
 export const formatWeight = (value: string | null): string =>
   value ? `${WEIGHT_FORMAT.format(Number(value))} kg` : "";
+
+const PRICE_FORMAT = new Intl.NumberFormat("en-GB", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+/** "12,500 USD", or a dash when no price was entered. */
+export const formatPrice = (
+  shipment: Pick<SelectShipments, "price" | "priceCurrency">,
+): string =>
+  shipment.price
+    ? `${PRICE_FORMAT.format(Number(shipment.price))} ${shipment.priceCurrency}`
+    : "—";

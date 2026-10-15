@@ -45,6 +45,15 @@ export const containerSizes = [
 
 export type ContainerSize = (typeof containerSizes)[number];
 
+/** The currency a shipment's price is in. */
+export const currencies = [
+  "USD",
+  "EUR",
+  "SAR",
+] as const satisfies readonly string[];
+
+export type Currency = (typeof currencies)[number];
+
 /** Where the last tracking update came from. */
 export const trackingSources = [
   "manual",

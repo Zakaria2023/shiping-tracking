@@ -16,6 +16,7 @@ import {
 import {
   carriers,
   containerSizes,
+  currencies,
   shipmentKinds,
   shipmentStatuses,
   trackingNumberTypes,
@@ -54,6 +55,10 @@ export const Shipments = mysqlTable(
     grossWeightKg: decimal("gross_weight_kg", { precision: 14, scale: 3 }),
     containerCount: int("container_count"),
     containerSize: mysqlEnum("container_size", containerSizes),
+
+    // What the shipment costs. Optional: older rows were saved without one.
+    price: decimal("price", { precision: 14, scale: 2 }),
+    priceCurrency: mysqlEnum("price_currency", currencies).notNull().default("USD"),
 
     etd: date("etd"),
     eta: date("eta"),

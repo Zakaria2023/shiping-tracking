@@ -5,6 +5,7 @@ import { SelectShipments } from "@/db/schema/shipments";
 import {
   carrierLabel,
   containerSummary,
+  formatPrice,
   formatWeight,
   shipmentTitle,
 } from "@/lib/shipment-display";
@@ -19,13 +20,14 @@ const CELL_CLASS = "px-4 py-3 align-top text-sm";
 
 export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
   <div className="overflow-x-auto rounded-card border border-hairline bg-surface">
-    <table className="w-full min-w-200 border-collapse">
+    <table className="w-full min-w-220 border-collapse">
       <thead className="border-b border-hairline bg-hover">
         <tr>
           <th className={HEAD_CLASS}>Status</th>
           <th className={HEAD_CLASS}>Shipment</th>
           <th className={HEAD_CLASS}>Route</th>
           <th className={HEAD_CLASS}>Cargo</th>
+          <th className={HEAD_CLASS}>Price</th>
           <th className={HEAD_CLASS}>ETD</th>
           <th className={HEAD_CLASS}>ETA</th>
           <th className={HEAD_CLASS}>Now at</th>
@@ -69,6 +71,9 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
             <td className={CELL_CLASS}>
               <p className="text-ink">{containerSummary(shipment) || "—"}</p>
               <p className="text-xs text-muted">{formatWeight(shipment.grossWeightKg)}</p>
+            </td>
+            <td className={`${CELL_CLASS} tabular whitespace-nowrap text-ink`}>
+              {formatPrice(shipment)}
             </td>
             <td className={`${CELL_CLASS} tabular whitespace-nowrap text-ink`}>
               {formatDate(shipment.etd) || "—"}

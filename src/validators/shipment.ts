@@ -1,6 +1,7 @@
 import {
   carriers,
   containerSizes,
+  currencies,
   shipmentKinds,
   shipmentStatuses,
   trackingNumberTypes,
@@ -42,6 +43,13 @@ export const shipmentFormSchema = z
       .optional()
       .or(z.literal("")),
     containerSize: z.enum(containerSizes).optional().or(z.literal("")),
+    price: z
+      .string()
+      .trim()
+      .regex(/^\d{0,12}(\.\d{0,2})?$/, "Price, numbers only")
+      .optional()
+      .or(z.literal("")),
+    priceCurrency: z.enum(currencies),
     etd: isoDate,
     eta: isoDate,
     status: z.enum(shipmentStatuses),

@@ -2,7 +2,7 @@ import { ArrowRight, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { TRACKING_NUMBER_TYPE_LABELS, TRACKING_SOURCE_LABELS } from "@/db/label";
 import { SelectShipments } from "@/db/schema/shipments";
-import { containerSummary, formatWeight } from "@/lib/shipment-display";
+import { containerSummary, formatPrice, formatWeight } from "@/lib/shipment-display";
 import { countryName, formatDate, formatDateTime, relativeDays } from "@/utils";
 
 type ShipmentSummaryProps = {
@@ -54,6 +54,7 @@ export const ShipmentSummary = ({ shipment }: ShipmentSummaryProps) => (
       />
       <Row label="Containers" value={containerSummary(shipment)} />
       <Row label="Gross weight" value={formatWeight(shipment.grossWeightKg)} />
+      <Row label="Price" value={formatPrice(shipment)} mono={Boolean(shipment.price)} />
       <Row label="Now at" value={shipment.currentLocation ?? ""} />
       <Row
         label="Last update"

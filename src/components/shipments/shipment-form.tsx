@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   carriers,
   containerSizes,
+  currencies,
   shipmentKinds,
   shipmentStatuses,
   trackingNumberTypes,
@@ -41,6 +42,7 @@ const SIZE_OPTIONS = [
   { value: "", label: "Not set" },
   ...containerSizes.map((size) => ({ value: size, label: CONTAINER_SIZE_LABELS[size] })),
 ];
+const CURRENCY_OPTIONS = currencies.map((currency) => ({ value: currency, label: currency }));
 const STATUS_OPTIONS = shipmentStatuses.map((status) => ({
   value: status,
   label: SHIPMENT_STATUS_LABELS[status],
@@ -194,6 +196,18 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
               </Field>
             </>
           )}
+          <Field label="Price" error={errors.price?.message}>
+            <Input {...register("price")} inputMode="decimal" placeholder="12500" className="tabular" />
+          </Field>
+          <Field label="Currency" error={errors.priceCurrency?.message}>
+            <Controller
+              control={control}
+              name="priceCurrency"
+              render={({ field }) => (
+                <Dropdown value={field.value} onChange={field.onChange} options={CURRENCY_OPTIONS} />
+              )}
+            />
+          </Field>
           <Field label="ETD" error={errors.etd?.message}>
             <Input type="date" {...register("etd")} />
           </Field>
