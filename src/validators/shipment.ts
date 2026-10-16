@@ -13,7 +13,7 @@ const optionalText = (max: number) =>
 
 const isoDate = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Use the date picker")
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Day/month/year, e.g. 27/10/2026")
   .optional()
   .or(z.literal(""));
 

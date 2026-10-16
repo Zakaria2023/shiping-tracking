@@ -5,6 +5,7 @@ import { Controller } from "react-hook-form";
 import { useShipmentForm } from "@/app/shipments/use-shipment-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DateInput } from "@/components/ui/date-input";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Field } from "@/components/ui/field";
 import { FormError } from "@/components/ui/form-error";
@@ -214,10 +215,34 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
             />
           </Field>
           <Field label="ETD" error={errors.etd?.message}>
-            <Input type="date" {...register("etd")} />
+            <Controller
+              control={control}
+              name="etd"
+              render={({ field }) => (
+                <DateInput
+                  name={field.name}
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  invalid={Boolean(errors.etd)}
+                />
+              )}
+            />
           </Field>
           <Field label="ETA" error={errors.eta?.message}>
-            <Input type="date" {...register("eta")} />
+            <Controller
+              control={control}
+              name="eta"
+              render={({ field }) => (
+                <DateInput
+                  name={field.name}
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  invalid={Boolean(errors.eta)}
+                />
+              )}
+            />
           </Field>
         </div>
       </Card>

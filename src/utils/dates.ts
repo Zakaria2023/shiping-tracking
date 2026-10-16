@@ -58,7 +58,24 @@ export const toIsoDate = (value: Date | null | undefined): string =>
     ? `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`
     : "";
 
-const DATE_FORMAT = new Intl.DateTimeFormat("en-GB", {
+/** "27/10/2026" as typed into a date field (also 27-10-2026 or 27.10.2026), as "2026-10-27". "" when it is not a real date. */
+export const dmyToIsoDate = (value: string): string => {
+  const match = value.trim().match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/);
+  if (!match) {
+    return "";
+  }
+  const [, d, m, y] = match;
+  const date = new Date(Number(y), Number(m) - 1, Number(d));
+  return date.getDate() === Number(d) && date.getMonth() === Number(m) - 1 ? toIsoDate(date) : "";
+};
+
+/** "2026-10-27" as "27/10/2026", the way a date field shows it. */
+export const isoDateToDmy = (value: string): string => {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? `${match[3]}/${match[2]}/${match[1]}` : "";
+};
+
+const DATE_FORMAT =new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
   month: "short",
   year: "numeric",
