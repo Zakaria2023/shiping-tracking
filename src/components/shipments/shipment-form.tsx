@@ -62,7 +62,12 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
-      <Card title="Shipment" description="What it is and who carries it.">
+      <Card title="Shipment" description="Who it is for, what it is and who carries it.">
+        <div className="mb-5 grid grid-cols-1 gap-5 md:grid-cols-3">
+          <Field label="Customer" error={errors.customerName?.message}>
+            <Input {...register("customerName")} invalid={Boolean(errors.customerName)} />
+          </Field>
+        </div>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <Field label="Type" error={errors.kind?.message}>
             <Controller

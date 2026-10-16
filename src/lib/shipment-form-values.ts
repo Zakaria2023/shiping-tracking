@@ -5,6 +5,7 @@ import { ShipmentFormValues } from "@/validators/shipment";
 
 /** What the form starts with for a new shipment. */
 export const EMPTY_SHIPMENT_FORM: ShipmentFormValues = {
+  customerName: "",
   kind: "container",
   carrier: "yang_ming",
   carrierName: "",
@@ -30,6 +31,7 @@ export const EMPTY_SHIPMENT_FORM: ShipmentFormValues = {
 
 /** A saved row, as the form fields. */
 export const toShipmentFormValues = (shipment: SelectShipments): ShipmentFormValues => ({
+  customerName: shipment.customerName ?? "",
   kind: shipment.kind,
   carrier: shipment.carrier,
   carrierName: shipment.carrierName ?? "",
@@ -60,6 +62,7 @@ const blankToNull = (value: string | undefined): string | null => {
 
 /** Validated form values, as the columns the service writes. */
 export const toShipmentFields = (values: ShipmentFormValues): ShipmentFields => ({
+  customerName: blankToNull(values.customerName),
   kind: values.kind,
   carrier: values.carrier,
   carrierName: values.carrier === "other" ? blankToNull(values.carrierName) : null,

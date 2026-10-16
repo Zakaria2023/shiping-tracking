@@ -36,6 +36,7 @@ export const ShipmentSummary = ({ shipment }: ShipmentSummaryProps) => (
       </p>
     </div>
     <dl className="divide-y divide-hairline-soft">
+      <Row label="Customer" value={shipment.customerName ?? "—"} />
       {shipment.trackingNumber && (
         <Row label={TRACKING_NUMBER_TYPE_LABELS[shipment.trackingNumberType]} value={shipment.trackingNumber} mono />
       )}

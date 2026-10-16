@@ -29,6 +29,9 @@ export const Shipments = mysqlTable(
     id: int("id").primaryKey().autoincrement(),
     uuid: char("uuid", { length: 36 }).notNull().unique(),
 
+    // Who the goods are for. Optional: older rows were saved without one.
+    customerName: varchar("customer_name", { length: 160 }),
+
     kind: mysqlEnum("kind", shipmentKinds).notNull().default("container"),
     // The shipping line — the sheet's "Company" column.
     carrier: mysqlEnum("carrier", carriers).notNull(),

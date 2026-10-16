@@ -39,7 +39,7 @@ export const ShipmentFilters = ({ loadingCountries, dischargeCountries }: Shipme
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search number, vessel or port"
+          placeholder="Search customer, number, vessel or port"
           className="ps-9"
         />
       </div>

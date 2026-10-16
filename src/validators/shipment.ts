@@ -19,6 +19,7 @@ const isoDate = z
 
 export const shipmentFormSchema = z
   .object({
+    customerName: optionalText(160),
     kind: z.enum(shipmentKinds),
     carrier: z.enum(carriers),
     carrierName: optionalText(120),

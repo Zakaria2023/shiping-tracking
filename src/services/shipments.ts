@@ -53,6 +53,7 @@ const searchFilter = (search?: string): SQL | undefined => {
   }
   const pattern = `%${term}%`;
   return or(
+    like(Shipments.customerName, pattern),
     like(Shipments.trackingNumber, pattern),
     like(Shipments.vesselName, pattern),
     like(Shipments.portOfLoading, pattern),

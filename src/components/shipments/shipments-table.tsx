@@ -1,4 +1,4 @@
-import { ArrowRight, CircleAlert, Lock } from "lucide-react";
+import { ArrowRight, CircleAlert, Lock, Pencil } from "lucide-react";
 import Link from "next/link";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SelectShipments } from "@/db/schema/shipments";
@@ -20,10 +20,11 @@ const CELL_CLASS = "px-4 py-3 align-top text-sm";
 
 export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
   <div className="overflow-x-auto rounded-card border border-hairline bg-surface">
-    <table className="w-full min-w-220 border-collapse">
+    <table className="w-full min-w-240 border-collapse">
       <thead className="border-b border-hairline bg-hover">
         <tr>
           <th className={HEAD_CLASS}>Status</th>
+          <th className={HEAD_CLASS}>Customer</th>
           <th className={HEAD_CLASS}>Shipment</th>
           <th className={HEAD_CLASS}>Route</th>
           <th className={HEAD_CLASS}>Cargo</th>
@@ -32,6 +33,9 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
           <th className={HEAD_CLASS}>ETA</th>
           <th className={HEAD_CLASS}>Destination</th>
           <th className={HEAD_CLASS}>Last update</th>
+          <th className={HEAD_CLASS}>
+            <span className="sr-only">Edit</span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -51,6 +55,7 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
                 {shipment.statusLocked && <Lock size={12} className="text-faint" />}
               </span>
             </td>
+            <td className={`${CELL_CLASS} text-ink`}>{shipment.customerName || "—"}</td>
             <td className={CELL_CLASS}>
               <p className="font-mono text-ink">{shipmentTitle(shipment)}</p>
               <p className="text-xs text-muted">
@@ -99,6 +104,16 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
               ) : (
                 formatDateTime(shipment.lastTrackedAt) || "Never"
               )}
+            </td>
+            <td className={`${CELL_CLASS} text-end`}>
+              <Link
+                href={`/shipments/${shipment.uuid}/edit`}
+                aria-label={`Edit ${shipmentTitle(shipment)}`}
+                title="Edit"
+                className="relative z-10 inline-flex rounded-control p-1.5 text-muted hover:bg-surface hover:text-ink"
+              >
+                <Pencil size={15} />
+              </Link>
             </td>
           </tr>
         ))}
