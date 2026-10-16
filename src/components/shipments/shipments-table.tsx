@@ -30,7 +30,7 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
           <th className={HEAD_CLASS}>Price</th>
           <th className={HEAD_CLASS}>ETD</th>
           <th className={HEAD_CLASS}>ETA</th>
-          <th className={HEAD_CLASS}>Now at</th>
+          <th className={HEAD_CLASS}>Destination</th>
           <th className={HEAD_CLASS}>Last update</th>
         </tr>
       </thead>
