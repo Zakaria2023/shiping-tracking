@@ -1,4 +1,5 @@
 export * from "./dashboard";
+export * from "./shipment-documents";
 export * from "./shipments";
 export * from "./tracking/apply";
 export * from "./tracking/msc";

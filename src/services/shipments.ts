@@ -4,13 +4,16 @@ import { Carrier, ShipmentKind, ShipmentStatus } from "@/db/enum";
 import {
   InsertShipments,
   SelectShipmentContainers,
+  SelectShipmentDocuments,
   SelectShipments,
   SelectTrackingEvents,
   ShipmentContainers,
+  ShipmentDocuments,
   Shipments,
   TrackingEvents,
 } from "@/db/schema";
 import { buildPaginatedResult, generateUuid, ListParams, PaginatedResult, resolvePagination } from "@/utils";
+import { deleteObjects } from "./storage";
 
 export type { SelectShipments, SelectShipmentContainers, SelectTrackingEvents };
 
@@ -39,6 +42,7 @@ export type ShipmentDetail = {
   shipment: SelectShipments;
   containers: SelectShipmentContainers[];
   events: SelectTrackingEvents[];
+  documents: SelectShipmentDocuments[];
 };
 
 export type CountryOptionRow = {
@@ -106,7 +110,7 @@ export const getShipment = async (uuid: string): Promise<ShipmentDetail | null> 
   if (!shipment) {
     return null;
   }
-  const [containers, events] = await Promise.all([
+  const [containers, events, documents] = await Promise.all([
     db
       .select()
       .from(ShipmentContainers)
@@ -117,8 +121,13 @@ export const getShipment = async (uuid: string): Promise<ShipmentDetail | null> 
       .from(TrackingEvents)
       .where(eq(TrackingEvents.shipmentUuid, uuid))
       .orderBy(desc(TrackingEvents.occurredAt), desc(TrackingEvents.sequence)),
+    db
+      .select()
+      .from(ShipmentDocuments)
+      .where(eq(ShipmentDocuments.shipmentUuid, uuid))
+      .orderBy(asc(ShipmentDocuments.createdAt), asc(ShipmentDocuments.id)),
   ]);
-  return { shipment, containers, events };
+  return { shipment, containers, events, documents };
 };
 
 export const createShipment = async (fields: ShipmentFields): Promise<string> => {
@@ -131,8 +140,19 @@ export const updateShipment = async (uuid: string, fields: ShipmentFields): Prom
   await db.update(Shipments).set(fields).where(eq(Shipments.uuid, uuid));
 };
 
+/** Delete the shipment; its rows cascade, and its documents leave the bucket. */
 export const deleteShipment = async (uuid: string): Promise<void> => {
+  const documents = await db
+    .select({ objectKey: ShipmentDocuments.objectKey })
+    .from(ShipmentDocuments)
+    .where(eq(ShipmentDocuments.shipmentUuid, uuid));
   await db.delete(Shipments).where(eq(Shipments.uuid, uuid));
+  try {
+    await deleteObjects(documents.map((document) => document.objectKey));
+  } catch (error) {
+    // The shipment is gone either way; a failure here only leaves stray files.
+    console.error("Failed to delete the shipment's documents from storage", error);
+  }
 };
 
 /** A person choosing the status: locked means a carrier refresh leaves it alone. */

@@ -18,6 +18,8 @@
     "resync:tracking": "dotenv -e .env.local -- tsx scripts/resync-tracking.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
     "@hookform/resolvers": "^5.4.0",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.22.0",

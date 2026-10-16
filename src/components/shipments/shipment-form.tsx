@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Controller } from "react-hook-form";
 import { useShipmentForm } from "@/app/shipments/use-shipment-form";
+import { DocumentsField } from "@/components/shipments/documents-field";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DateInput } from "@/components/ui/date-input";
@@ -26,12 +27,13 @@ import {
   SHIPMENT_STATUS_LABELS,
   TRACKING_NUMBER_TYPE_LABELS,
 } from "@/db/label";
+import { SelectShipmentDocuments } from "@/db/schema/shipment-documents";
 import { SelectShipments } from "@/db/schema/shipments";
 import { COUNTRY_OPTIONS } from "@/utils";
 
 type ShipmentFormProps =
   | { mode: "add" }
-  | { mode: "edit"; shipment: SelectShipments };
+  | { mode: "edit"; shipment: SelectShipments; documents: SelectShipmentDocuments[] };
 
 const KIND_OPTIONS = shipmentKinds.map((kind) => ({ value: kind, label: SHIPMENT_KIND_LABELS[kind] }));
 const CARRIER_OPTIONS = carriers.map((carrier) => ({ value: carrier, label: CARRIER_LABELS[carrier] }));
@@ -50,8 +52,10 @@ const STATUS_OPTIONS = shipmentStatuses.map((status) => ({
 }));
 
 export const ShipmentForm = (props: ShipmentFormProps) => {
-  const { form, state, isPending, onSubmit, kind, carrier } = useShipmentForm(
-    props.mode === "edit" ? { mode: "edit", shipment: props.shipment } : { mode: "add" },
+  const { form, error, isPending, onSubmit, kind, carrier, documents } = useShipmentForm(
+    props.mode === "edit"
+      ? { mode: "edit", shipment: props.shipment, documents: props.documents }
+      : { mode: "add" },
   );
   const {
     register,
@@ -276,7 +280,9 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
         </div>
       </Card>
 
-      <FormError message={state.error} />
+      <DocumentsField documents={documents} />
+
+      <FormError message={error} />
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={isPending}>

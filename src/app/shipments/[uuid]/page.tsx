@@ -2,6 +2,7 @@ import { ExternalLink, Pencil } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ContainersList } from "@/components/shipments/containers-list";
+import { DocumentsList } from "@/components/shipments/documents-list";
 import { MscPasteForm } from "@/components/shipments/msc-paste-form";
 import { RefreshButton } from "@/components/shipments/refresh-button";
 import { ShipmentSummary } from "@/components/shipments/shipment-summary";
@@ -22,7 +23,7 @@ const ShipmentPage = async ({ params }: Props) => {
   if (!detail) {
     notFound();
   }
-  const { shipment, containers, events } = detail;
+  const { shipment, containers, events, documents } = detail;
   const carrierUrl = carrierTrackingUrl(
     shipment.carrier,
     shipment.trackingNumber,
@@ -73,6 +74,7 @@ const ShipmentPage = async ({ params }: Props) => {
         </div>
         <div className="flex flex-col gap-5 lg:sticky lg:top-6 lg:self-start">
           <ShipmentSummary shipment={shipment} />
+          <DocumentsList shipmentUuid={shipment.uuid} documents={documents} />
           <StatusEditor shipment={shipment} />
           {shipment.carrier === "msc" && <MscPasteForm uuid={shipment.uuid} />}
         </div>

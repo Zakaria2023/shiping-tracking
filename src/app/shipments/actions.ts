@@ -6,10 +6,14 @@ import { toShipmentFields } from "@/lib/shipment-form-values";
 import {
   createShipment,
   deleteShipment,
+  deleteShipmentDocuments,
+  DocumentUpload,
+  finishDocumentUpload,
   ingestMscTrackingInfo,
   refreshAllYangMing,
   refreshYangMingShipment,
   setShipmentStatus,
+  startDocumentUpload,
   unlockShipmentStatus,
   updateShipment,
 } from "@/services";
@@ -20,8 +24,21 @@ import {
   StatusUpdateValues,
   statusUpdateSchema,
 } from "@/validators/shipment";
+import {
+  DocumentDeleteValues,
+  documentDeleteSchema,
+  DocumentFinishValues,
+  documentFinishSchema,
+  DocumentUploadValues,
+  documentUploadSchema,
+} from "@/validators/shipment-document";
 
 export type MessageResult = ActionResult & { message?: string };
+
+/** A saved shipment: the form uploads its documents against this uuid, then navigates. */
+export type SaveShipmentResult = ActionResult & { uuid?: string };
+
+export type DocumentUploadResult = ActionResult & { upload?: DocumentUpload };
 
 const revalidateShipment = (uuid?: string) => {
   revalidatePath("/");
@@ -32,9 +49,8 @@ const revalidateShipment = (uuid?: string) => {
 };
 
 export const createShipmentAction = async (
-  _prevState: ActionResult,
   values: ShipmentFormValues,
-): Promise<ActionResult> => {
+): Promise<SaveShipmentResult> => {
   const parsed = shipmentFormSchema.safeParse(values);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the form" };
@@ -46,14 +62,13 @@ export const createShipmentAction = async (
     return fail(error, "Failed to create the shipment");
   }
   revalidateShipment(uuid);
-  redirect(`/shipments/${uuid}`);
+  return { success: true, uuid };
 };
 
 export const updateShipmentAction = async (
   uuid: string,
-  _prevState: ActionResult,
   values: ShipmentFormValues,
-): Promise<ActionResult> => {
+): Promise<SaveShipmentResult> => {
   const parsed = shipmentFormSchema.safeParse(values);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the form" };
@@ -67,7 +82,64 @@ export const updateShipmentAction = async (
     return fail(error, "Failed to save the shipment");
   }
   revalidateShipment(uuid);
-  redirect(`/shipments/${uuid}`);
+  return { success: true, uuid };
+};
+
+/** A signed URL to upload one document of this shipment to. */
+export const startDocumentUploadAction = async (
+  values: DocumentUploadValues,
+): Promise<DocumentUploadResult> => {
+  const parsed = documentUploadSchema.safeParse(values);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "That file cannot be attached" };
+  }
+  try {
+    const upload = await startDocumentUpload(
+      parsed.data.shipmentUuid,
+      parsed.data.fileName,
+      parsed.data.sizeBytes,
+    );
+    return { success: true, upload };
+  } catch (error) {
+    return fail(error, `Could not start uploading ${parsed.data.fileName}`);
+  }
+};
+
+/** Record an uploaded document against its shipment. */
+export const finishDocumentUploadAction = async (
+  values: DocumentFinishValues,
+): Promise<ActionResult> => {
+  const parsed = documentFinishSchema.safeParse(values);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "That file cannot be attached" };
+  }
+  try {
+    await finishDocumentUpload(
+      parsed.data.shipmentUuid,
+      parsed.data.documentUuid,
+      parsed.data.fileName,
+    );
+  } catch (error) {
+    return fail(error, `Could not save ${parsed.data.fileName}`);
+  }
+  revalidateShipment(parsed.data.shipmentUuid);
+  return { success: true };
+};
+
+export const deleteDocumentsAction = async (
+  values: DocumentDeleteValues,
+): Promise<ActionResult> => {
+  const parsed = documentDeleteSchema.safeParse(values);
+  if (!parsed.success) {
+    return { error: "Could not remove those documents" };
+  }
+  try {
+    await deleteShipmentDocuments(parsed.data.shipmentUuid, parsed.data.documentUuids);
+  } catch (error) {
+    return fail(error, "Could not remove the documents");
+  }
+  revalidateShipment(parsed.data.shipmentUuid);
+  return { success: true };
 };
 
 export const deleteShipmentAction = async (uuid: string): Promise<ActionResult> => {
