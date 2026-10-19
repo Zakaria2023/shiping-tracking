@@ -23,7 +23,7 @@ const EditShipmentPage = async ({ params, searchParams }: Props) => {
     <div className="flex flex-col gap-5">
       <PageHeader
         title={`Edit ${shipmentTitle(detail.shipment)}`}
-        actions={<DeleteShipmentButton uuid={uuid} />}
+        actions={<DeleteShipmentButton uuid={uuid} afterDelete="/shipments" />}
       />
       {documents === "failed" && (
         <FormError message="The shipment was created, but some documents did not upload. Add them again below and save." />

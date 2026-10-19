@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { toShipmentFields } from "@/lib/shipment-form-values";
 import {
   createShipment,
@@ -149,7 +148,7 @@ export const deleteShipmentAction = async (uuid: string): Promise<ActionResult> 
     return fail(error, "Failed to delete the shipment");
   }
   revalidateShipment();
-  redirect("/shipments");
+  return { success: true };
 };
 
 export const setStatusAction = async (

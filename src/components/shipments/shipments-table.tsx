@@ -1,5 +1,6 @@
 import { ArrowRight, CircleAlert, Lock, Pencil } from "lucide-react";
 import Link from "next/link";
+import { DeleteShipmentButton } from "@/components/shipments/delete-shipment-button";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SelectShipments } from "@/db/schema/shipments";
 import {
@@ -34,7 +35,7 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
           <th className={HEAD_CLASS}>Destination</th>
           <th className={HEAD_CLASS}>Last update</th>
           <th className={HEAD_CLASS}>
-            <span className="sr-only">Edit</span>
+            <span className="sr-only">Actions</span>
           </th>
         </tr>
       </thead>
@@ -105,7 +106,7 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
                 formatDateTime(shipment.lastTrackedAt) || "Never"
               )}
             </td>
-            <td className={`${CELL_CLASS} text-end`}>
+            <td className={`${CELL_CLASS} whitespace-nowrap text-end`}>
               <Link
                 href={`/shipments/${shipment.uuid}/edit`}
                 aria-label={`Edit ${shipmentTitle(shipment)}`}
@@ -114,6 +115,11 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
               >
                 <Pencil size={15} />
               </Link>
+              <DeleteShipmentButton
+                uuid={shipment.uuid}
+                variant="icon"
+                label={shipmentTitle(shipment)}
+              />
             </td>
           </tr>
         ))}
