@@ -47,6 +47,48 @@
   --animate-fade-in: fade-in 0.15s ease-out;
 }
 
+/* Dark theme: the same tokens, redefined. Every utility reads them through
+   var(), so nothing else changes. data-theme is set before first paint by the
+   script in app/layout.tsx, from the saved choice or the system setting. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-primary: #3b8ad8;
+  --color-primary-hover: #5299e0;
+  --color-primary-tint: #132840;
+  --color-primary-tint-border: #1f3d5f;
+
+  --color-accent: #2fb5a5;
+
+  --color-ink: #e4ebf3;
+  --color-muted: #9aabbf;
+  --color-faint: #6a7b90;
+
+  --color-page: #0b121b;
+  --color-surface: #111a25;
+  --color-overlay: #172230;
+  --color-hairline: #233144;
+  --color-hairline-soft: #1a2636;
+  --color-hover: #162131;
+  --color-scrim: rgba(0, 0, 0, 0.65);
+
+  --color-pending: #eba24a;
+  --color-pending-tint: #2d2112;
+  --color-sailing: #5ea6ea;
+  --color-sailing-tint: #12263c;
+  --color-arrived: #3cc4b2;
+  --color-arrived-tint: #0f2b29;
+  --color-delivered: #62c178;
+  --color-delivered-tint: #13291a;
+
+  --color-danger: #f07070;
+  --color-danger-tint: #341618;
+}
+
+:root {
+  color-scheme: light;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

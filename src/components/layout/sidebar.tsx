@@ -3,6 +3,7 @@
 import { LayoutDashboard, Plus, Ship } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "./theme-toggle";
 
 type NavItem = {
   href: string;
@@ -22,7 +23,8 @@ export const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-60 shrink-0 border-e border-hairline bg-surface md:flex md:flex-col">
+    // Sticky at full viewport height, so "New shipment" stays in view while the page scrolls.
+    <aside className="hidden w-60 shrink-0 border-e border-hairline bg-surface md:sticky md:top-0 md:flex md:h-screen md:flex-col">
       <div className="flex items-center gap-3 border-b border-hairline px-5 py-5">
         <span className="flex h-9 w-9 items-center justify-center rounded-control bg-primary text-white">
           <Ship size={18} />
@@ -33,7 +35,7 @@ export const Sidebar = () => {
         </div>
       </div>
 
-      <nav className="flex flex-col gap-1 p-3">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href);
           return (
@@ -53,7 +55,8 @@ export const Sidebar = () => {
         })}
       </nav>
 
-      <div className="mt-auto p-3">
+      <div className="flex flex-col gap-2 border-t border-hairline p-3">
+        <ThemeToggle />
         <Link
           href="/shipments/new"
           className="flex items-center justify-center gap-2 rounded-control bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary-hover"
