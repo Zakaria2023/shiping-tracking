@@ -12,6 +12,7 @@ export const CARRIER_LABELS: Record<Carrier, string> = {
   msc: "MSC",
   bulk_carrier: "Bulk Carrier",
   other: "Other",
+  not_yet: "Not yet",
 };
 
 export const SHIPMENT_KIND_LABELS: Record<ShipmentKind, string> = {

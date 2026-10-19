@@ -105,7 +105,13 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
               <Field
                 label="Tracking number"
                 error={errors.trackingNumber?.message}
-                hint={tracked ? "As printed by the line. This is what tracking searches for." : undefined}
+                hint={
+                  tracked
+                    ? "As printed by the line. This is what tracking searches for."
+                    : carrier === "not_yet"
+                      ? "Optional until the line is booked."
+                      : undefined
+                }
               >
                 <Input
                   {...register("trackingNumber")}

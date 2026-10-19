@@ -58,7 +58,8 @@ export const shipmentFormSchema = z
     notes: optionalText(2000),
   })
   .superRefine((values, ctx) => {
-    if (values.kind === "container" && !values.trackingNumber) {
+    // Until a line is booked there is no number to give.
+    if (values.kind === "container" && values.carrier !== "not_yet" && !values.trackingNumber) {
       ctx.addIssue({
         code: "custom",
         path: ["trackingNumber"],

@@ -7,6 +7,8 @@ export const carriers = [
   "msc",
   "bulk_carrier",
   "other",
+  // The line is not booked yet; the shipment is planned but has no number.
+  "not_yet",
 ] as const satisfies readonly string[];
 
 export type Carrier = (typeof carriers)[number];
