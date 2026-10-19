@@ -71,7 +71,7 @@ export const ShipmentSummary = ({ shipment }: ShipmentSummaryProps) => (
     {shipment.statusLocked && (
       <p className="mt-3 flex items-center gap-2 text-xs text-muted">
         <Lock size={12} />
-        Status set by hand; carrier updates will not change it.
+        Status set manually; carrier updates will not change it.
       </p>
     )}
     {shipment.trackingError && (

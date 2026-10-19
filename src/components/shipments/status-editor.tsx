@@ -36,7 +36,7 @@ export const StatusEditor = ({ shipment }: StatusEditorProps) => {
 
   return (
     <Card
-      title="Set by hand"
+      title="Set manually"
       description={
         tracked
           ? "Override what the line reports. Tick the box to keep it until you unlock it."

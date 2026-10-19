@@ -262,7 +262,7 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
         description={
           tracked && !isBulk
             ? "A starting point. Once tracking runs, the line's own events set it."
-            : "Set by hand, since nothing tracks this one automatically."
+            : "Set manually, since nothing tracks this one automatically."
         }
       >
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">

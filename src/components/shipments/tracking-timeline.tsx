@@ -25,7 +25,7 @@ const iconFor = (event: SelectTrackingEvents) => {
 
 const emptyDescription = (shipment: SelectShipments): string => {
   if (shipment.kind === "bulk") {
-    return "A bulk ship has no carrier events; its status and location are kept by hand.";
+    return "A bulk ship has no carrier events; its status and location are kept manually.";
   }
   if (shipment.carrier === "yang_ming") {
     return "Press Refresh to pull the routing from Yang Ming.";
@@ -33,7 +33,7 @@ const emptyDescription = (shipment: SelectShipments): string => {
   if (shipment.carrier === "msc") {
     return "Open the MSC page with the extension installed, or paste the MSC result below.";
   }
-  return "Nothing tracks this line automatically; keep the status by hand.";
+  return "Nothing tracks this line automatically; keep the status manually.";
 };
 
 export const TrackingTimeline = ({ events, shipment }: TrackingTimelineProps) => {

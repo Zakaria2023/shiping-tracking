@@ -40,7 +40,7 @@ export const CONTAINER_SIZE_LABELS: Record<ContainerSize, string> = {
 };
 
 export const TRACKING_SOURCE_LABELS: Record<TrackingSource, string> = {
-  manual: "Entered by hand",
+  manual: "Entered manually",
   yang_ming: "Yang Ming",
   msc_extension: "MSC (browser extension)",
   msc_paste: "MSC (pasted)",

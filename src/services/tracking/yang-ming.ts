@@ -225,7 +225,7 @@ export const fetchYangMingTracking = async (
     payload.blockStatus.isInBlackList === true
   ) {
     throw new Error(
-      "Yang Ming has blocked this server's address; open the tracking page by hand for now",
+      "Yang Ming has blocked this server's address; open the tracking page manually for now",
     );
   }
   return parseYangMingResponse(payload, trackingNumber);
