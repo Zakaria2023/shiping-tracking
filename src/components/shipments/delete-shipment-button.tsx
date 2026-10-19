@@ -3,6 +3,7 @@
 import { Trash2 } from "lucide-react";
 import { useDeleteShipment } from "@/app/shipments/use-delete-shipment";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type DeleteShipmentButtonProps = {
   uuid: string;
@@ -17,35 +18,42 @@ export const DeleteShipmentButton = ({
   uuid,
   variant = "button",
   afterDelete,
-  label = "shipment",
+  label = "this shipment",
 }: DeleteShipmentButtonProps) => {
-  const { onDelete, isPending, error } = useDeleteShipment(uuid, afterDelete);
+  const { open, isPending, error, requestDelete, cancel, confirm } = useDeleteShipment(
+    uuid,
+    afterDelete,
+  );
 
-  if (variant === "icon") {
-    return (
-      <span className="relative z-10 inline-flex flex-col items-end">
+  return (
+    <>
+      {variant === "icon" ? (
         <button
           type="button"
-          onClick={onDelete}
-          disabled={isPending}
+          onClick={requestDelete}
           aria-label={`Delete ${label}`}
-          title={error ?? "Delete"}
-          className="inline-flex rounded-control p-1.5 text-muted hover:bg-danger-tint hover:text-danger disabled:opacity-60"
+          title="Delete"
+          className="relative z-10 inline-flex rounded-control p-1.5 text-muted hover:bg-danger-tint hover:text-danger"
         >
           <Trash2 size={15} />
         </button>
-        {error && <span className="text-xs text-danger">Not deleted</span>}
-      </span>
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-3">
-      {error && <span className="text-sm text-danger">{error}</span>}
-      <Button variant="danger" disabled={isPending} onClick={onDelete}>
-        <Trash2 size={16} />
-        {isPending ? "Deleting…" : "Delete"}
-      </Button>
-    </div>
+      ) : (
+        <Button variant="danger" onClick={requestDelete}>
+          <Trash2 size={16} />
+          Delete
+        </Button>
+      )}
+      <ConfirmDialog
+        open={open}
+        title={`Delete ${label}?`}
+        message="Its tracking history and documents are deleted with it. This cannot be undone."
+        confirmLabel="Delete"
+        pendingLabel="Deleting…"
+        isPending={isPending}
+        error={error}
+        onConfirm={confirm}
+        onCancel={cancel}
+      />
+    </>
   );
 };
