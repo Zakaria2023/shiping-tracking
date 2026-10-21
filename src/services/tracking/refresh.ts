@@ -1,5 +1,6 @@
 import { and, eq, inArray, isNotNull, ne } from "drizzle-orm";
 import { db } from "@/db";
+import { Carrier } from "@/db/enum";
 import { Shipments } from "@/db/schema/shipments";
 import { ApplyOutcome, applySnapshot, recordTrackingError } from "./apply";
 import { parseMscTrackingInfo } from "./msc";
@@ -38,6 +39,23 @@ export const refreshYangMingShipment = async (uuid: string): Promise<ApplyOutcom
     const message = error instanceof Error ? error.message : "Refresh failed";
     await recordTrackingError(uuid, message);
     throw error;
+  }
+};
+
+/** Whether the app can pull this shipment from the carrier itself. */
+export const isAutoTracked = (shipment: { carrier: Carrier; trackingNumber?: string | null }): boolean =>
+  shipment.carrier === "yang_ming" && Boolean(shipment.trackingNumber);
+
+/**
+ * Pull a Yang Ming shipment straight after it is saved, so its page opens on
+ * the carrier's data. A failure is already stored on the shipment as its
+ * tracking error, and the save itself stands, so nothing is thrown.
+ */
+export const trackAfterSave = async (uuid: string): Promise<void> => {
+  try {
+    await refreshYangMingShipment(uuid);
+  } catch (error) {
+    console.error("Tracking right after saving failed", error);
   }
 };
 

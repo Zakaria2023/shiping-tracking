@@ -136,8 +136,32 @@ export const createShipment = async (fields: ShipmentFields): Promise<string> =>
   return uuid;
 };
 
-export const updateShipment = async (uuid: string, fields: ShipmentFields): Promise<void> => {
-  await db.update(Shipments).set(fields).where(eq(Shipments.uuid, uuid));
+/**
+ * Save the form's fields. `needsTracking` is true when the line or the number
+ * changed, or the shipment was never tracked, so the caller can pull it now.
+ */
+export const updateShipment = async (
+  uuid: string,
+  fields: ShipmentFields,
+): Promise<{ needsTracking: boolean }> => {
+  const [before] = await db
+    .select({
+      carrier: Shipments.carrier,
+      trackingNumber: Shipments.trackingNumber,
+      lastTrackedAt: Shipments.lastTrackedAt,
+    })
+    .from(Shipments)
+    .where(eq(Shipments.uuid, uuid));
+  const identityChanged =
+    !before ||
+    before.carrier !== fields.carrier ||
+    before.trackingNumber !== (fields.trackingNumber ?? null);
+  await db
+    .update(Shipments)
+    // A tracking error belongs to the old line and number; it says nothing about the new ones.
+    .set(identityChanged ? { ...fields, trackingError: null } : fields)
+    .where(eq(Shipments.uuid, uuid));
+  return { needsTracking: identityChanged || before.lastTrackedAt === null };
 };
 
 /** Delete the shipment; its rows cascade, and its documents leave the bucket. */

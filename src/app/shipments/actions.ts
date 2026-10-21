@@ -11,8 +11,10 @@ import {
   ingestMscTrackingInfo,
   refreshAllYangMing,
   refreshYangMingShipment,
+  isAutoTracked,
   setShipmentStatus,
   startDocumentUpload,
+  trackAfterSave,
   unlockShipmentStatus,
   updateShipment,
 } from "@/services";
@@ -54,11 +56,15 @@ export const createShipmentAction = async (
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the form" };
   }
+  const fields = toShipmentFields(parsed.data);
   let uuid: string;
   try {
-    uuid = await createShipment(toShipmentFields(parsed.data));
+    uuid = await createShipment(fields);
   } catch (error) {
     return fail(error, "Failed to create the shipment");
+  }
+  if (isAutoTracked(fields)) {
+    await trackAfterSave(uuid);
   }
   revalidateShipment(uuid);
   return { success: true, uuid };
@@ -72,13 +78,17 @@ export const updateShipmentAction = async (
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the form" };
   }
+  // Editing the form never touches the lock; the status editor owns that.
+  const { statusLocked: _ignored, ...fields } = toShipmentFields(parsed.data);
+  void _ignored;
+  let needsTracking: boolean;
   try {
-    // Editing the form never touches the lock; the status editor owns that.
-    const { statusLocked: _ignored, ...fields } = toShipmentFields(parsed.data);
-    void _ignored;
-    await updateShipment(uuid, fields);
+    ({ needsTracking } = await updateShipment(uuid, fields));
   } catch (error) {
     return fail(error, "Failed to save the shipment");
+  }
+  if (needsTracking && isAutoTracked(fields)) {
+    await trackAfterSave(uuid);
   }
   revalidateShipment(uuid);
   return { success: true, uuid };
