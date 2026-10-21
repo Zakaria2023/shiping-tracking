@@ -1,0 +1,76 @@
+F12 TRACKING - WHICH REQUEST TO COPY FOR EACH LINE
+==================================================
+
+These lines block the app's server, so their data has to come from your own
+browser. On each site you open the tracking page, search your number, and
+copy one request from the F12 Network tab.
+
+Lines the app reads by itself, with no F12 needed:
+Yang Ming, COSCO, ONE, Arkas, First Flight.
+
+
+HOW TO COPY A REQUEST
+---------------------
+1. Open the line's link below, press F12, go to the "Network" tab and click
+   "Fetch/XHR".
+2. Search your tracking number on the site.
+3. Find the request named below. If you can't find it, press Ctrl+F inside
+   the Network panel and type your tracking number. The panel shows which
+   request contains it.
+4. Click the request, open "Response", then right-click and choose
+   "Copy response".
+5. If Fetch/XHR shows nothing useful, click "All" instead. The data is then
+   inside the page itself, so copy the page's main request.
+
+
+1. MSC  (the paste box already exists in the app)
+   Link:    https://www.msc.com/en/track-a-shipment
+   Request: TrackingInfo
+   Status:  KNOWN
+
+2. TURKON
+   Link:    https://myturkonline.turkon.com/tracking
+   Request: getTrackingLowerInformation
+            (copy this one; it holds the events. Skip getTrackingTopInformation.)
+   Status:  KNOWN (found in the site's code)
+
+3. MAERSK
+   Link:    https://www.maersk.com/tracking/YOUR_NUMBER
+   Request: YOUR_NUMBER?operator=MAEU
+            (sent to api.maersk.com/synergy/tracking/)
+   Status:  KNOWN
+
+4. OOCL
+   Link:    https://www.oocl.com/eng/ourservices/eservices/cargotracking/pages/cargotracking.aspx
+   Request: ct_search_from_other_domain.jsf
+            (sent to moc.oocl.com. If its answer is a web page rather than
+            data, copy the request that loads right after it.)
+   Status:  PROBABLE (the site blocked the check before its answer could be seen)
+
+5. CMA CGM
+   Link:    https://www.cma-cgm.com/ebusiness/tracking
+   Request: search?SearchBy=BL&Reference=YOUR_NUMBER
+            (this may be the whole page rather than a separate data request;
+            if so, look under "All")
+   Status:  PROBABLE (the site blocked the check before its answer could be seen)
+
+6. HAPAG-LLOYD
+   Link:    https://www.hapag-lloyd.com/en/online-business/track/track-by-booking-solution.html
+            (for a container number:
+            https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html)
+   Request: NOT KNOWN YET. Find it with the Ctrl+F trick in step 3.
+
+7. M LINE
+   Link:    https://tracking.mline.global/
+   Request: NOT KNOWN YET. Find it with the Ctrl+F trick in step 3.
+
+8. TARROS
+   Link:    https://www.tarros.it/utilities/container-tracking/
+   Request: NOT KNOWN YET. Find it with the Ctrl+F trick in step 3.
+
+
+WHAT TO SEND BACK
+-----------------
+For each line: the request's name and the copied response. A real tracking
+number on its own is also enough. The app's paste box for that line is then
+built from it, the same as the one MSC has.
