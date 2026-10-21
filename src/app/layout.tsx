@@ -1,7 +1,9 @@
+// Trigger Deploy
+
+import { Shell } from "@/components/layout/shell";
 import { Metadata } from "next";
 import localFont from "next/font/local";
 import { ReactNode } from "react";
-import { Shell } from "@/components/layout/shell";
 import "./globals.css";
 
 // Self-hosted variable fonts: one file covers every weight, and a build never
