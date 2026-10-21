@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { CARRIER_LABELS } from "@/db/label";
 import { toShipmentFields } from "@/lib/shipment-form-values";
 import {
   createShipment,
@@ -9,9 +10,9 @@ import {
   DocumentUpload,
   finishDocumentUpload,
   ingestMscTrackingInfo,
-  refreshAllYangMing,
-  refreshYangMingShipment,
   isAutoTracked,
+  refreshAllTracked,
+  refreshCarrierShipment,
   setShipmentStatus,
   startDocumentUpload,
   trackAfterSave,
@@ -194,27 +195,28 @@ export const unlockStatusAction = async (uuid: string): Promise<MessageResult> =
   return { success: true, message: "The carrier sets the status again" };
 };
 
-/** Pull one Yang Ming shipment now. */
+/** Pull one shipment from its line now. */
 export const refreshShipmentAction = async (uuid: string): Promise<MessageResult> => {
   try {
-    const outcome = await refreshYangMingShipment(uuid);
+    const outcome = await refreshCarrierShipment(uuid);
     revalidateShipment(uuid);
+    const line = CARRIER_LABELS[outcome.carrier];
     return {
       success: true,
       message: outcome.newEvents
-        ? `${outcome.newEvents} new event${outcome.newEvents === 1 ? "" : "s"} from Yang Ming`
-        : "Up to date with Yang Ming",
+        ? `${outcome.newEvents} new event${outcome.newEvents === 1 ? "" : "s"} from ${line}`
+        : `Up to date with ${line}`,
     };
   } catch (error) {
     revalidateShipment(uuid);
-    return fail(error, "Could not reach Yang Ming");
+    return fail(error, "Could not reach the line");
   }
 };
 
-/** Pull every open Yang Ming shipment. */
-export const refreshAllYangMingAction = async (): Promise<MessageResult> => {
+/** Pull every open shipment on a line the app reads. */
+export const refreshAllTrackedAction = async (): Promise<MessageResult> => {
   try {
-    const summary = await refreshAllYangMing();
+    const summary = await refreshAllTracked();
     revalidateShipment();
     return {
       success: true,

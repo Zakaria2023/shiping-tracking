@@ -10,6 +10,7 @@ import { Field } from "@/components/ui/field";
 import { FormError } from "@/components/ui/form-error";
 import { Input } from "@/components/ui/input";
 import { shipmentStatuses } from "@/db/enum";
+import { isCarrierTracked } from "@/lib/carrier-tracking";
 import { SHIPMENT_STATUS_LABELS } from "@/db/label";
 import { SelectShipments } from "@/db/schema/shipments";
 
@@ -30,9 +31,7 @@ export const StatusEditor = ({ shipment }: StatusEditorProps) => {
     control,
     formState: { errors },
   } = form;
-  const tracked =
-    shipment.kind === "container" &&
-    (shipment.carrier === "yang_ming" || shipment.carrier === "msc");
+  const tracked = shipment.kind === "container" && isCarrierTracked(shipment.carrier);
 
   return (
     <Card

@@ -9,6 +9,19 @@ export const carriers = [
   "other",
   // The line is not booked yet; the shipment is planned but has no number.
   "not_yet",
+  "cosco",
+  "one",
+  "arkas",
+  "turkon",
+  // A courier, for the documents that travel apart from the cargo.
+  "first_flight",
+  "oocl",
+  "cma_cgm",
+  "hapag_lloyd",
+  "maersk",
+  "m_line",
+  "tarros",
+  "transwagon",
 ] as const satisfies readonly string[];
 
 export type Carrier = (typeof carriers)[number];
@@ -62,6 +75,10 @@ export const trackingSources = [
   "yang_ming",
   "msc_extension",
   "msc_paste",
+  "cosco",
+  "one",
+  "arkas",
+  "first_flight",
 ] as const satisfies readonly string[];
 
 export type TrackingSource = (typeof trackingSources)[number];

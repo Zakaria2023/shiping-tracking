@@ -39,3 +39,39 @@ PortOfDischarge, Transshipments[], FinalPodEtaDate) and `ContainersInfo[]`
 (ContainerNumber, ContainerType, Delivered, PodEtaDate, LatestMove, `Events[]`
 newest first with Description, Date, Location, UnLocationCode, vessel + voyage in
 `Detail`). Dates are `DD/MM/YYYY`.
+
+## The other lines — probed 2026-10-21
+
+Tried with plain server requests (a Chrome User-Agent and the page's Referer),
+a handful of calls each. Wired in `src/lib/carrier-tracking.ts` and
+`src/services/tracking/trackers.ts`.
+
+**Read by the server** (on save, on Refresh and by the daily cron):
+
+- **COSCO** — `cosco-*.json`. `GET https://elines.coscoshipping.com/ebtracking/public/bill/<B/L without COSU>`
+  (legs, separate estimated and actual dates) and `.../public/bill/containers/<same>`
+  (each box's latest move); `.../public/containers/<container>` for a box on its own.
+  Dates `YYYY-MM-DD HH:mm`, port time. Anonymous callers get no fuller history.
+- **ONE** — `one-*.json`. `POST https://ecomm.one-line.com/api/v2/edh/containers/track-and-trace/search`
+  with `{"page":1,"page_length":20,"filters":{"search_text":"<no>","search_type":"BKG_NO"|"CNTR_NO"}}`
+  and Origin `https://www.one-line.com`; then `GET .../cop-events?booking_no=&container_no=` per box.
+  `eventLocalPortDate` is port time with a `Z` it does not mean. E106/E138 = delivered.
+- **Arkas** — `GET https://webtrackingprodnew.arkasline.com.tr/api/request/Get?controllerMethod=webtracking/api/shipmenttracking/GetDocumentationAsync&prms={"key":"<no>"}`,
+  then `GetDocumentationHistoryAsync` with `{"documentationId":<id>}` per box. The answer is JSON
+  inside a JSON string. `isDummy` = planned move. No real number seen yet.
+- **First Flight** (courier, for documents) — `POST https://webapi.firstflightme.com/api/user/track-by-awb`
+  with `{"number":"<awb>"}`. An unknown number is echoed back with every other field null.
+  `Status` "POD" = delivered. Date format not yet seen; read loosely. No real number seen yet.
+
+**Browser only** — the server is turned away:
+
+- MSC (Akamai), OOCL (Cloudflare challenge), CMA CGM (DataDome), Hapag-Lloyd (Cloudflare),
+  Maersk (Akamai). CMA CGM, Hapag-Lloyd and Maersk have official DCSA APIs behind a registered key.
+- Turkon — Cloudflare lets curl through but answers 403 to Node's fetch. Its API:
+  `POST https://myturkonline.turkon.com/shipping-prod-service/tracking/getTrackingLowerInformation/en/<no>`
+  with `{"token":null,"cookie":null}`; events at `payload[].getKonteynerTakipEventSet.results[]`.
+- M Line and Tarros reset every connection from servers.
+
+**Not lines:** TransWagon (cs.groupwagon.com) is a forwarder whose page forwards to track-trace.com.
+MarineTraffic is vessel AIS; its JSON answers plain requests but its terms forbid automated use,
+so bulk shipments only get a "Find vessel on MarineTraffic" link.

@@ -4,8 +4,9 @@ import { Search, X } from "lucide-react";
 import { useShipmentFilters } from "@/app/shipments/use-shipment-filters";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
-import { carriers, shipmentStatuses } from "@/db/enum";
-import { CARRIER_LABELS, SHIPMENT_STATUS_LABELS } from "@/db/label";
+import { shipmentStatuses } from "@/db/enum";
+import { SHIPMENT_STATUS_LABELS } from "@/db/label";
+import { CARRIER_OPTIONS as LINE_OPTIONS } from "@/lib/shipment-display";
 import { CountryOptionRow } from "@/services/shipments";
 import { countryName } from "@/utils";
 
@@ -21,7 +22,7 @@ const STATUS_OPTIONS = [
 
 const CARRIER_OPTIONS = [
   { value: "", label: "Any line" },
-  ...carriers.map((carrier) => ({ value: carrier, label: CARRIER_LABELS[carrier] })),
+  ...LINE_OPTIONS,
 ];
 
 const countryOptions = (rows: CountryOptionRow[], anyLabel: string) => [

@@ -9,7 +9,7 @@ type RefreshButtonProps = {
   uuid: string;
 };
 
-/** One button, one call: pull this shipment from Yang Ming now. */
+/** One button, one call: pull this shipment from its line now. */
 export const RefreshButton = ({ uuid }: RefreshButtonProps) => {
   const [state, dispatch, isPending] = useActionState(() => refreshShipmentAction(uuid), {});
 

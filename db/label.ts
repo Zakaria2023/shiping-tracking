@@ -13,6 +13,18 @@ export const CARRIER_LABELS: Record<Carrier, string> = {
   bulk_carrier: "Bulk Carrier",
   other: "Other",
   not_yet: "Not yet",
+  cosco: "COSCO",
+  one: "ONE",
+  arkas: "Arkas",
+  turkon: "Turkon",
+  first_flight: "First Flight",
+  oocl: "OOCL",
+  cma_cgm: "CMA CGM",
+  hapag_lloyd: "Hapag-Lloyd",
+  maersk: "Maersk",
+  m_line: "M Line",
+  tarros: "Tarros",
+  transwagon: "TransWagon",
 };
 
 export const SHIPMENT_KIND_LABELS: Record<ShipmentKind, string> = {
@@ -44,4 +56,8 @@ export const TRACKING_SOURCE_LABELS: Record<TrackingSource, string> = {
   yang_ming: "Yang Ming",
   msc_extension: "MSC (browser extension)",
   msc_paste: "MSC (pasted)",
+  cosco: "COSCO",
+  one: "ONE",
+  arkas: "Arkas",
+  first_flight: "First Flight",
 };

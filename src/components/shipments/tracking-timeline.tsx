@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SelectShipments } from "@/db/schema/shipments";
 import { SelectTrackingEvents } from "@/db/schema/tracking-events";
+import { browserOnlyCarriers, isAutoTrackedCarrier } from "@/lib/carrier-tracking";
+import { carrierLabel } from "@/lib/shipment-display";
 import { formatDateTime } from "@/utils";
 
 type TrackingTimelineProps = {
@@ -27,11 +29,16 @@ const emptyDescription = (shipment: SelectShipments): string => {
   if (shipment.kind === "bulk") {
     return "A bulk ship has no carrier events; its status and location are kept manually.";
   }
-  if (shipment.carrier === "yang_ming") {
-    return "Press Refresh to pull the routing from Yang Ming.";
+  if (isAutoTrackedCarrier(shipment.carrier)) {
+    return shipment.trackingError
+      ? `${carrierLabel(shipment)} did not answer with this shipment; check the number, then press Refresh.`
+      : `Press Refresh to pull the tracking from ${carrierLabel(shipment)}.`;
   }
   if (shipment.carrier === "msc") {
     return "Open the MSC page with the extension installed, or paste the MSC result below.";
+  }
+  if ((browserOnlyCarriers as readonly string[]).includes(shipment.carrier)) {
+    return `${carrierLabel(shipment)} only shows tracking to a real browser, so open its page and keep the status manually.`;
   }
   return "Nothing tracks this line automatically; keep the status manually.";
 };

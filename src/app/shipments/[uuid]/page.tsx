@@ -9,9 +9,10 @@ import { ShipmentSummary } from "@/components/shipments/shipment-summary";
 import { StatusEditor } from "@/components/shipments/status-editor";
 import { TrackingTimeline } from "@/components/shipments/tracking-timeline";
 import { StatusPill } from "@/components/ui/status-pill";
+import { isAutoTrackedCarrier } from "@/lib/carrier-tracking";
 import { carrierLabel, shipmentTitle } from "@/lib/shipment-display";
 import { getShipment } from "@/services";
-import { carrierTrackingUrl } from "@/utils";
+import { carrierTrackingUrl, vesselTrackingUrl } from "@/utils";
 
 type Props = {
   params: Promise<{ uuid: string }>;
@@ -29,6 +30,7 @@ const ShipmentPage = async ({ params }: Props) => {
     shipment.trackingNumber,
     shipment.trackingNumberType,
   );
+  const vesselUrl = shipment.kind === "bulk" ? vesselTrackingUrl(shipment.vesselName) : null;
 
   return (
     <div className="flex flex-col gap-5">
@@ -43,7 +45,7 @@ const ShipmentPage = async ({ params }: Props) => {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {shipment.carrier === "yang_ming" && shipment.trackingNumber && (
+          {isAutoTrackedCarrier(shipment.carrier) && shipment.trackingNumber && (
             <RefreshButton uuid={shipment.uuid} />
           )}
           {carrierUrl && (
@@ -55,6 +57,17 @@ const ShipmentPage = async ({ params }: Props) => {
             >
               <ExternalLink size={16} />
               Open {carrierLabel(shipment)} page
+            </a>
+          )}
+          {vesselUrl && (
+            <a
+              href={vesselUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-control border border-hairline bg-surface px-4 py-2 text-sm font-medium text-ink hover:bg-hover"
+            >
+              <ExternalLink size={16} />
+              Find vessel on MarineTraffic
             </a>
           )}
           <Link

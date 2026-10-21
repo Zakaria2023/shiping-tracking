@@ -1,3 +1,4 @@
+import { Carrier, carriers } from "@/db/enum";
 import { CARRIER_LABELS } from "@/db/label";
 import { SelectShipments } from "@/db/schema/shipments";
 
@@ -13,6 +14,17 @@ export const carrierLabel = (
   shipment.carrier === "other" && shipment.carrierName
     ? shipment.carrierName
     : CARRIER_LABELS[shipment.carrier];
+
+// Not lines in their own right, so they follow the named lines.
+const CATCH_ALL_CARRIERS: readonly Carrier[] = ["bulk_carrier", "other", "not_yet"];
+
+/** Every line for a picker: the named lines A to Z, then bulk, other and "not yet". */
+export const CARRIER_OPTIONS: { value: Carrier; label: string }[] = [
+  ...carriers
+    .filter((carrier) => !CATCH_ALL_CARRIERS.includes(carrier))
+    .sort((a, b) => CARRIER_LABELS[a].localeCompare(CARRIER_LABELS[b], "en-GB")),
+  ...CATCH_ALL_CARRIERS,
+].map((carrier) => ({ value: carrier, label: CARRIER_LABELS[carrier] }));
 
 /** "2 × 40 ft" from the count and size columns. */
 export const containerSummary = (

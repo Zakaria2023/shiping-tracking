@@ -1,0 +1,140 @@
+{
+ "bill": {
+  "code": "200",
+  "message": "",
+  "data": {
+   "content": {
+    "transportationType3": "Truck",
+    "transportationType4": "Vessel",
+    "cargoTrackingContainer": [
+     {
+      "cntrNum": "OOCU0485448",
+      "emptyPickUpDt": null,
+      "ladenReturnDt": null,
+      "firstPOL": null,
+      "ndLoadDt1": null,
+      "ndDischDt1": null,
+      "ndLoadDt2": null,
+      "ndDischDt2": null,
+      "ndLoadDt3": null,
+      "ndDischDt3": null,
+      "ladenPickUpDt": null,
+      "emptyReturnDt": null,
+      "devan": null,
+      "lfd": null,
+      "pickUpNumber": null,
+      "depotLfd": null,
+      "amsRelease": null,
+      "dtLoc": null,
+      "hsCode": []
+     }
+    ],
+    "bookingNumbersInBillOfLadingTrackingGroupAssociationList": [],
+    "trackingNA": null,
+    "actualShipment": [
+     {
+      "rownum": "1",
+      "sequenceNumber": "1",
+      "vesselName": "COSCO SHIPPING ROSE",
+      "voyageNo": "047W",
+      "portOfLoading": "Nansha",
+      "actualShippingDate": "2026-09-25 01:21",
+      "expectedDateOfDeparture": "2026-09-25 21:00",
+      "actualDepartureDate": "2026-09-25 21:11",
+      "portOfDischarge": "Mersin",
+      "estimatedDateOfArrival": "2026-10-20 10:00",
+      "actualArrivalDate": "2026-10-20 07:21",
+      "actualDischargeDate": "2026-10-20 17:18",
+      "city": null,
+      "service": "AEM3",
+      "vesselCde": "CJI",
+      "transType": "Vessel"
+     }
+    ],
+    "fastLabel": null,
+    "betdNotice": false,
+    "lfd": "LFD",
+    "slowLabel": null,
+    "isShow": false,
+    "trackingPath": {
+     "billOfladingRefCode": "6463957370",
+     "trackingGroupReferenceCode": "6463957370",
+     "fromCity": "Nansha,GD,Guangzhou,China",
+     "toCity": "Mersin,Turkey",
+     "cgoAvailTm": "2026-10-21 16:26",
+     "cgoFinalTm": null,
+     "vslNme": "COSCO SHIPPING ROSE",
+     "voyNumber": "047W",
+     "pol": "Nansha-Guangzhou South China Oceangate",
+     "pod": "Mersin-Mersin Int'l Port Management Inc.",
+     "flag": "0",
+     "svvd": "AEM3CJI045W",
+     "blType": "Original",
+     "blRealStatus": "Not Yet"
+    },
+    "usDisplay": false,
+    "cargoCutOff": null,
+    "usOrCanadaDisplay": false,
+    "itNumber": null,
+    "actualShipmentPic": [
+     {
+      "rownum": "1",
+      "sequenceNumber": "1",
+      "vesselName": "COSCO SHIPPING ROSE",
+      "voyageNo": "047W",
+      "portOfLoading": "Nansha",
+      "actualShippingDate": "2026-09-25 01:21",
+      "expectedDateOfDeparture": "2026-09-25 21:00",
+      "actualDepartureDate": "2026-09-25 21:11",
+      "portOfDischarge": "Mersin",
+      "estimatedDateOfArrival": "2026-10-20 10:00",
+      "actualArrivalDate": "2026-10-20 07:21",
+      "actualDischargeDate": "2026-10-20 17:18",
+      "city": null,
+      "service": "AEM3",
+      "vesselCde": "CJI",
+      "transType": "Vessel"
+     }
+    ],
+    "checkHanJin": false,
+    "isbillOfLadingExist": true
+   }
+  }
+ },
+ "containers": {
+  "code": "200",
+  "message": "",
+  "data": {
+   "content": [
+    {
+     "containerUuid": null,
+     "containerNumber": "OOCU0485448",
+     "containerType": "20GP",
+     "grossWeight": null,
+     "piecesNumber": null,
+     "label": "Discharged at Last POD",
+     "sealNumber": null,
+     "location": "Mersin Int'l Port Management Inc.,Mersin,Mersin,Turkey",
+     "locationDateTime": "2026-10-20 17:18",
+     "transportation": "Vessel",
+     "flag": "2",
+     "showDryIot": 0,
+     "railRef": null,
+     "inlandMvId": null,
+     "containerLocation": "0",
+     "northAmericaRails": false,
+     "polEtd": null,
+     "polAtd": null,
+     "podEta": null,
+     "podAta": null,
+     "transportId": null,
+     "pol": null,
+     "pod": null,
+     "hsCode": [],
+     "cntrShpmtParty": 0,
+     "show": false
+    }
+   ]
+  }
+ }
+}

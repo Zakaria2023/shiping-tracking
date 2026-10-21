@@ -15,7 +15,7 @@ import { readFileSync } from "node:fs";
 import { db } from "../db";
 import { ShipmentContainers } from "../db/schema/shipment-containers";
 import { TrackingEvents } from "../db/schema/tracking-events";
-import { ingestMscTrackingInfo, refreshAllYangMing } from "../src/services";
+import { ingestMscTrackingInfo, refreshAllTracked } from "../src/services";
 
 const run = async () => {
   const deleted = await db.delete(TrackingEvents);
@@ -24,9 +24,9 @@ const run = async () => {
     `Removed ${deleted[0].affectedRows} events and ${deletedBoxes[0].affectedRows} containers.`,
   );
 
-  const yangMing = await refreshAllYangMing();
+  const tracked = await refreshAllTracked();
   console.log(
-    `Yang Ming: ${yangMing.refreshed} refreshed, ${yangMing.failed} failed, ${yangMing.statusChanges} status changes.`,
+    `Lines read by the app: ${tracked.refreshed} refreshed, ${tracked.failed} failed, ${tracked.statusChanges} status changes.`,
   );
 
   for (const file of process.argv.slice(2)) {

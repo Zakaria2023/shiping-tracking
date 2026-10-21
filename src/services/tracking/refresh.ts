@@ -1,16 +1,20 @@
 import { and, eq, inArray, isNotNull, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { Carrier } from "@/db/enum";
+import { CARRIER_LABELS } from "@/db/label";
 import { Shipments } from "@/db/schema/shipments";
+import { AutoTrackedCarrier, autoTrackedCarriers, isAutoTrackedCarrier } from "@/lib/carrier-tracking";
 import { ApplyOutcome, applySnapshot, recordTrackingError } from "./apply";
 import { parseMscTrackingInfo } from "./msc";
-import { fetchYangMingTracking } from "./yang-ming";
+import { TRACKERS } from "./trackers";
 
 export type RefreshSummary = {
   refreshed: number;
   failed: number;
   statusChanges: number;
 };
+
+export type RefreshOutcome = ApplyOutcome & { carrier: AutoTrackedCarrier };
 
 export type MscIngestOutcome = {
   trackingNumber: string;
@@ -20,8 +24,8 @@ export type MscIngestOutcome = {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Pull one Yang Ming shipment from the carrier and store it. */
-export const refreshYangMingShipment = async (uuid: string): Promise<ApplyOutcome> => {
+/** Pull one shipment from its line and store it. */
+export const refreshCarrierShipment = async (uuid: string): Promise<RefreshOutcome> => {
   const [shipment] = await db
     .select({ trackingNumber: Shipments.trackingNumber, carrier: Shipments.carrier })
     .from(Shipments)
@@ -29,12 +33,17 @@ export const refreshYangMingShipment = async (uuid: string): Promise<ApplyOutcom
   if (!shipment) {
     throw new Error("Shipment not found");
   }
-  if (shipment.carrier !== "yang_ming" || !shipment.trackingNumber) {
-    throw new Error("Only a Yang Ming shipment with a tracking number can be refreshed here");
+  const { carrier, trackingNumber } = shipment;
+  if (!isAutoTrackedCarrier(carrier) || !trackingNumber) {
+    throw new Error(
+      trackingNumber
+        ? `The app cannot read ${CARRIER_LABELS[carrier]} itself`
+        : "Add the tracking number first",
+    );
   }
   try {
-    const snapshot = await fetchYangMingTracking(shipment.trackingNumber);
-    return await applySnapshot(uuid, snapshot, "yang_ming");
+    const snapshot = await TRACKERS[carrier](trackingNumber);
+    return { ...(await applySnapshot(uuid, snapshot, carrier)), carrier };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Refresh failed";
     await recordTrackingError(uuid, message);
@@ -44,32 +53,32 @@ export const refreshYangMingShipment = async (uuid: string): Promise<ApplyOutcom
 
 /** Whether the app can pull this shipment from the carrier itself. */
 export const isAutoTracked = (shipment: { carrier: Carrier; trackingNumber?: string | null }): boolean =>
-  shipment.carrier === "yang_ming" && Boolean(shipment.trackingNumber);
+  isAutoTrackedCarrier(shipment.carrier) && Boolean(shipment.trackingNumber);
 
 /**
- * Pull a Yang Ming shipment straight after it is saved, so its page opens on
- * the carrier's data. A failure is already stored on the shipment as its
+ * Pull a shipment straight after it is saved, so its page opens on the
+ * carrier's data. A failure is already stored on the shipment as its
  * tracking error, and the save itself stands, so nothing is thrown.
  */
 export const trackAfterSave = async (uuid: string): Promise<void> => {
   try {
-    await refreshYangMingShipment(uuid);
+    await refreshCarrierShipment(uuid);
   } catch (error) {
     console.error("Tracking right after saving failed", error);
   }
 };
 
 /**
- * Every Yang Ming shipment that is not yet delivered, one at a time with a
- * pause between calls so the carrier never sees a burst from this address.
+ * Every open shipment on a line the app reads, one at a time with a pause
+ * between calls so no carrier sees a burst from this address.
  */
-export const refreshAllYangMing = async (): Promise<RefreshSummary> => {
+export const refreshAllTracked = async (): Promise<RefreshSummary> => {
   const rows = await db
     .select({ uuid: Shipments.uuid })
     .from(Shipments)
     .where(
       and(
-        eq(Shipments.carrier, "yang_ming"),
+        inArray(Shipments.carrier, [...autoTrackedCarriers]),
         isNotNull(Shipments.trackingNumber),
         ne(Shipments.status, "delivered"),
       ),
@@ -82,7 +91,7 @@ export const refreshAllYangMing = async (): Promise<RefreshSummary> => {
       await sleep(2_000);
     }
     try {
-      const outcome = await refreshYangMingShipment(row.uuid);
+      const outcome = await refreshCarrierShipment(row.uuid);
       summary.refreshed += 1;
       if (outcome.statusChanged) {
         summary.statusChanges += 1;

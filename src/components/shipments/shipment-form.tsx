@@ -13,7 +13,6 @@ import { FormError } from "@/components/ui/form-error";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  carriers,
   containerSizes,
   currencies,
   shipmentKinds,
@@ -21,7 +20,6 @@ import {
   trackingNumberTypes,
 } from "@/db/enum";
 import {
-  CARRIER_LABELS,
   CONTAINER_SIZE_LABELS,
   SHIPMENT_KIND_LABELS,
   SHIPMENT_STATUS_LABELS,
@@ -29,6 +27,8 @@ import {
 } from "@/db/label";
 import { SelectShipmentDocuments } from "@/db/schema/shipment-documents";
 import { SelectShipments } from "@/db/schema/shipments";
+import { isAutoTrackedCarrier, isCarrierTracked } from "@/lib/carrier-tracking";
+import { CARRIER_OPTIONS } from "@/lib/shipment-display";
 import { COUNTRY_OPTIONS } from "@/utils";
 
 type ShipmentFormProps =
@@ -36,7 +36,6 @@ type ShipmentFormProps =
   | { mode: "edit"; shipment: SelectShipments; documents: SelectShipmentDocuments[] };
 
 const KIND_OPTIONS = shipmentKinds.map((kind) => ({ value: kind, label: SHIPMENT_KIND_LABELS[kind] }));
-const CARRIER_OPTIONS = carriers.map((carrier) => ({ value: carrier, label: CARRIER_LABELS[carrier] }));
 const NUMBER_TYPE_OPTIONS = trackingNumberTypes.map((type) => ({
   value: type,
   label: TRACKING_NUMBER_TYPE_LABELS[type],
@@ -63,7 +62,7 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
     formState: { errors },
   } = form;
   const isBulk = kind === "bulk";
-  const tracked = carrier === "yang_ming" || carrier === "msc";
+  const tracked = isCarrierTracked(carrier);
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
@@ -106,11 +105,13 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
                 label="Tracking number"
                 error={errors.trackingNumber?.message}
                 hint={
-                  tracked
-                    ? "As printed by the line. This is what tracking searches for."
-                    : carrier === "not_yet"
-                      ? "Optional until the line is booked."
-                      : undefined
+                  isAutoTrackedCarrier(carrier)
+                    ? "As printed by the line. Its tracking is pulled as soon as you save."
+                    : tracked
+                      ? "As printed by the line. This is what tracking searches for."
+                      : carrier === "not_yet"
+                        ? "Optional until the line is booked."
+                        : undefined
                 }
               >
                 <Input
