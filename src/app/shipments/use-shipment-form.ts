@@ -3,17 +3,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { SelectShipmentCargoLines } from "@/db/schema/shipment-cargo-lines";
 import { SelectShipmentDocuments } from "@/db/schema/shipment-documents";
 import { SelectShipments } from "@/db/schema/shipments";
-import { EMPTY_SHIPMENT_FORM, toShipmentFormValues } from "@/lib/shipment-form-values";
+import {
+  EMPTY_CARGO_LINE,
+  EMPTY_SHIPMENT_FORM,
+  toShipmentFormValues,
+} from "@/lib/shipment-form-values";
 import { shipmentFormSchema, ShipmentFormValues } from "@/validators/shipment";
 import { createShipmentAction, updateShipmentAction } from "./actions";
 import { useShipmentDocuments } from "./use-shipment-documents";
 
 type UseShipmentFormArgs =
   | { mode: "add" }
-  | { mode: "edit"; shipment: SelectShipments; documents: SelectShipmentDocuments[] };
+  | {
+      mode: "edit";
+      shipment: SelectShipments;
+      cargoLines: SelectShipmentCargoLines[];
+      documents: SelectShipmentDocuments[];
+    };
 
 export const useShipmentForm = (args: UseShipmentFormArgs) => {
   const router = useRouter();
@@ -24,8 +34,13 @@ export const useShipmentForm = (args: UseShipmentFormArgs) => {
   const form = useForm<ShipmentFormValues>({
     resolver: zodResolver(shipmentFormSchema),
     defaultValues:
-      args.mode === "edit" ? toShipmentFormValues(args.shipment) : EMPTY_SHIPMENT_FORM,
+      args.mode === "edit"
+        ? toShipmentFormValues(args.shipment, args.cargoLines)
+        : EMPTY_SHIPMENT_FORM,
   });
+
+  const lines = useFieldArray({ control: form.control, name: "cargoLines" });
+  const addCargoLine = () => lines.append(EMPTY_CARGO_LINE);
 
   // The form shows different fields for a bulk ship and for an "other" line.
   const kind = useWatch({ control: form.control, name: "kind" });
@@ -57,5 +72,16 @@ export const useShipmentForm = (args: UseShipmentFormArgs) => {
     });
   });
 
-  return { form, error, isPending, onSubmit, kind, carrier, documents };
+  return {
+    form,
+    error,
+    isPending,
+    onSubmit,
+    kind,
+    carrier,
+    documents,
+    cargoLines: lines.fields,
+    addCargoLine,
+    removeCargoLine: lines.remove,
+  };
 };

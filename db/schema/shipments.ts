@@ -4,7 +4,6 @@ import {
   char,
   date,
   datetime,
-  decimal,
   index,
   int,
   mysqlEnum,
@@ -15,7 +14,6 @@ import {
 } from "drizzle-orm/mysql-core";
 import {
   carriers,
-  containerSizes,
   currencies,
   shipmentKinds,
   shipmentStatuses,
@@ -55,12 +53,7 @@ export const Shipments = mysqlTable(
     portOfDischarge: varchar("port_of_discharge", { length: 120 }).notNull(),
     dischargeCountry: char("discharge_country", { length: 2 }).notNull(),
 
-    grossWeightKg: decimal("gross_weight_kg", { precision: 14, scale: 3 }),
-    containerCount: int("container_count"),
-    containerSize: mysqlEnum("container_size", containerSizes),
-
-    // What the shipment costs. Optional: older rows were saved without one.
-    price: decimal("price", { precision: 14, scale: 2 }),
+    // The currency of every cargo line's price; the lines are in ShipmentCargoLines.
     priceCurrency: mysqlEnum("price_currency", currencies).notNull().default("USD"),
 
     etd: date("etd"),
@@ -74,6 +67,8 @@ export const Shipments = mysqlTable(
     // Where the goods are now: typed for a bulk ship, taken from the latest
     // carrier event for a container shipment.
     currentLocation: varchar("current_location", { length: 160 }),
+    // Where a bulk ship calls next, typed by hand.
+    nextLocation: varchar("next_location", { length: 160 }),
     lastEventAt: datetime("last_event_at"),
     lastEventDescription: varchar("last_event_description", { length: 160 }),
 

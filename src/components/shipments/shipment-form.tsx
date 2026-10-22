@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus, X } from "lucide-react";
 import Link from "next/link";
 import { Controller } from "react-hook-form";
 import { useShipmentForm } from "@/app/shipments/use-shipment-form";
@@ -25,6 +26,7 @@ import {
   SHIPMENT_STATUS_LABELS,
   TRACKING_NUMBER_TYPE_LABELS,
 } from "@/db/label";
+import { SelectShipmentCargoLines } from "@/db/schema/shipment-cargo-lines";
 import { SelectShipmentDocuments } from "@/db/schema/shipment-documents";
 import { SelectShipments } from "@/db/schema/shipments";
 import { isAutoTrackedCarrier, isCarrierTracked } from "@/lib/carrier-tracking";
@@ -33,7 +35,12 @@ import { COUNTRY_OPTIONS } from "@/utils";
 
 type ShipmentFormProps =
   | { mode: "add" }
-  | { mode: "edit"; shipment: SelectShipments; documents: SelectShipmentDocuments[] };
+  | {
+      mode: "edit";
+      shipment: SelectShipments;
+      cargoLines: SelectShipmentCargoLines[];
+      documents: SelectShipmentDocuments[];
+    };
 
 const KIND_OPTIONS = shipmentKinds.map((kind) => ({ value: kind, label: SHIPMENT_KIND_LABELS[kind] }));
 const NUMBER_TYPE_OPTIONS = trackingNumberTypes.map((type) => ({
@@ -51,9 +58,25 @@ const STATUS_OPTIONS = shipmentStatuses.map((status) => ({
 }));
 
 export const ShipmentForm = (props: ShipmentFormProps) => {
-  const { form, error, isPending, onSubmit, kind, carrier, documents } = useShipmentForm(
+  const {
+    form,
+    error,
+    isPending,
+    onSubmit,
+    kind,
+    carrier,
+    documents,
+    cargoLines,
+    addCargoLine,
+    removeCargoLine,
+  } = useShipmentForm(
     props.mode === "edit"
-      ? { mode: "edit", shipment: props.shipment, documents: props.documents }
+      ? {
+          mode: "edit",
+          shipment: props.shipment,
+          cargoLines: props.cargoLines,
+          documents: props.documents,
+        }
       : { mode: "add" },
   );
   const {
@@ -193,29 +216,75 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
       </Card>
 
       <Card title="Cargo and dates" description="From the booking. Tracking updates the dates when the line does.">
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
-          <Field label="Gross weight (kg)" error={errors.grossWeightKg?.message}>
-            <Input {...register("grossWeightKg")} inputMode="decimal" placeholder="26854" className="tabular" />
-          </Field>
-          {!isBulk && (
-            <>
-              <Field label="Containers" error={errors.containerCount?.message}>
-                <Input {...register("containerCount")} inputMode="numeric" placeholder="2" className="tabular" />
-              </Field>
-              <Field label="Size" error={errors.containerSize?.message}>
-                <Controller
-                  control={control}
-                  name="containerSize"
-                  render={({ field }) => (
-                    <Dropdown value={field.value ?? ""} onChange={field.onChange} options={SIZE_OPTIONS} />
-                  )}
-                />
-              </Field>
-            </>
-          )}
-          <Field label="Price" error={errors.price?.message}>
-            <Input {...register("price")} inputMode="decimal" placeholder="12500" className="tabular" />
-          </Field>
+        <ul className="flex flex-col gap-4">
+          {cargoLines.map((line, index) => {
+            const lineErrors = errors.cargoLines?.[index];
+            return (
+              <li
+                key={line.id}
+                className={`grid grid-cols-[1fr_1fr_auto] gap-x-5 gap-y-4 ${
+                  isBulk ? "md:grid-cols-[1fr_1fr_auto]" : "md:grid-cols-[1fr_1fr_1fr_1fr_auto]"
+                }`}
+              >
+                <Field label="Gross weight (kg)" error={lineErrors?.grossWeightKg?.message}>
+                  <Input
+                    {...register(`cargoLines.${index}.grossWeightKg`)}
+                    inputMode="decimal"
+                    placeholder="26854"
+                    className="tabular"
+                  />
+                </Field>
+                {!isBulk && (
+                  <>
+                    <Field label="Containers" error={lineErrors?.containerCount?.message}>
+                      <Input
+                        {...register(`cargoLines.${index}.containerCount`)}
+                        inputMode="numeric"
+                        placeholder="2"
+                        className="tabular"
+                      />
+                    </Field>
+                    <Field label="Size" error={lineErrors?.containerSize?.message}>
+                      <Controller
+                        control={control}
+                        name={`cargoLines.${index}.containerSize`}
+                        render={({ field }) => (
+                          <Dropdown value={field.value ?? ""} onChange={field.onChange} options={SIZE_OPTIONS} />
+                        )}
+                      />
+                    </Field>
+                  </>
+                )}
+                <Field label="Price" error={lineErrors?.price?.message}>
+                  <Input
+                    {...register(`cargoLines.${index}.price`)}
+                    inputMode="decimal"
+                    placeholder="12500"
+                    className="tabular"
+                  />
+                </Field>
+                <div className="col-start-3 row-start-1 flex items-end pb-2 md:col-start-auto">
+                  <button
+                    type="button"
+                    onClick={() => removeCargoLine(index)}
+                    disabled={cargoLines.length === 1}
+                    aria-label={`Remove line ${index + 1}`}
+                    title="Remove line"
+                    className="rounded-control p-1.5 text-faint hover:bg-hover hover:text-ink disabled:invisible"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <Button variant="secondary" onClick={addCargoLine} className="mt-4">
+          <Plus size={15} />
+          Add line
+        </Button>
+
+        <div className="mt-5 grid grid-cols-2 gap-5 border-t border-hairline-soft pt-5 md:grid-cols-4">
           <Field label="Currency" error={errors.priceCurrency?.message}>
             <Controller
               control={control}
@@ -258,33 +327,33 @@ export const ShipmentForm = (props: ShipmentFormProps) => {
         </div>
       </Card>
 
+      {/* A container shipment's status and whereabouts come from its line. */}
       <Card
-        title="Status"
-        description={
-          tracked && !isBulk
-            ? "A starting point. Once tracking runs, the line's own events set it."
-            : "Set manually, since nothing tracks this one automatically."
-        }
+        title={isBulk ? "Status" : "Notes"}
+        description={isBulk ? "Set manually, since nothing tracks a bulk ship automatically." : undefined}
       >
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <Field label="Status" error={errors.status?.message}>
-            <Controller
-              control={control}
-              name="status"
-              render={({ field }) => (
-                <Dropdown value={field.value} onChange={field.onChange} options={STATUS_OPTIONS} />
-              )}
-            />
-          </Field>
-          <Field label="Current location" error={errors.currentLocation?.message} hint="Where the goods are now, e.g. Suez Canal.">
-            <Input {...register("currentLocation")} />
-          </Field>
-        </div>
-        <div className="mt-5">
-          <Field label="Notes" error={errors.notes?.message}>
-            <Textarea {...register("notes")} rows={3} />
-          </Field>
-        </div>
+        {isBulk && (
+          <div className="mb-5 grid grid-cols-1 gap-5 md:grid-cols-3">
+            <Field label="Status" error={errors.status?.message}>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Dropdown value={field.value} onChange={field.onChange} options={STATUS_OPTIONS} />
+                )}
+              />
+            </Field>
+            <Field label="Current location" error={errors.currentLocation?.message} hint="Where the ship is now, e.g. Suez Canal.">
+              <Input {...register("currentLocation")} />
+            </Field>
+            <Field label="Next location" error={errors.nextLocation?.message} hint="Where it calls next, e.g. Port Said.">
+              <Input {...register("nextLocation")} />
+            </Field>
+          </div>
+        )}
+        <Field label="Notes" error={errors.notes?.message}>
+          <Textarea {...register("notes")} rows={3} />
+        </Field>
       </Card>
 
       <DocumentsField documents={documents} />

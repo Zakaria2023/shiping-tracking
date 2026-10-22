@@ -10,10 +10,11 @@
  */
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
+import { ShipmentCargoLines } from "../db/schema/shipment-cargo-lines";
 import { Shipments } from "../db/schema/shipments";
-import { ShipmentFields } from "../src/services/shipments";
+import { CargoLineFields, ShipmentFields } from "../src/services/shipments";
 
-type SheetRow = ShipmentFields;
+type SheetRow = ShipmentFields & { cargo: CargoLineFields };
 
 const d = (year: number, month: number, day: number) => new Date(year, month - 1, day);
 
@@ -37,9 +38,12 @@ const container = (
   loadingCountry: route[1],
   portOfDischarge: route[2],
   dischargeCountry: route[3],
-  grossWeightKg: cargo.kg ? String(cargo.kg) : null,
-  containerCount: cargo.count ?? null,
-  containerSize: cargo.size ?? null,
+  cargo: {
+    grossWeightKg: cargo.kg ? String(cargo.kg) : null,
+    containerCount: cargo.count ?? null,
+    containerSize: cargo.size ?? null,
+    price: null,
+  },
   etd: dates.etd ?? null,
   eta: dates.eta ?? null,
   status,
@@ -66,9 +70,7 @@ const bulk = (
   loadingCountry: route[1],
   portOfDischarge: route[2],
   dischargeCountry: route[3],
-  grossWeightKg: String(kg),
-  containerCount: null,
-  containerSize: null,
+  cargo: { grossWeightKg: String(kg), containerCount: null, containerSize: null, price: null },
   etd: dates.etd ?? null,
   eta: dates.eta ?? null,
   status: "sailing",
@@ -155,25 +157,39 @@ const ROWS: SheetRow[] = [
 ];
 
 const exists = async (row: SheetRow): Promise<boolean> => {
-  const where = row.trackingNumber
-    ? eq(Shipments.trackingNumber, row.trackingNumber)
-    : and(
-        eq(Shipments.vesselName, row.vesselName ?? ""),
-        eq(Shipments.grossWeightKg, row.grossWeightKg ?? ""),
-      );
-  const [found] = await db.select({ id: Shipments.id }).from(Shipments).where(where).limit(1);
+  const [found] = row.trackingNumber
+    ? await db
+        .select({ id: Shipments.id })
+        .from(Shipments)
+        .where(eq(Shipments.trackingNumber, row.trackingNumber))
+        .limit(1)
+    : await db
+        .select({ id: Shipments.id })
+        .from(Shipments)
+        .innerJoin(ShipmentCargoLines, eq(ShipmentCargoLines.shipmentUuid, Shipments.uuid))
+        .where(
+          and(
+            eq(Shipments.vesselName, row.vesselName ?? ""),
+            eq(ShipmentCargoLines.grossWeightKg, row.cargo.grossWeightKg ?? ""),
+          ),
+        )
+        .limit(1);
   return Boolean(found);
 };
 
 const run = async () => {
   let inserted = 0;
   let skipped = 0;
-  for (const row of ROWS) {
-    if (await exists(row)) {
+  for (const { cargo, ...row } of ROWS) {
+    if (await exists({ ...row, cargo })) {
       skipped += 1;
       continue;
     }
-    await db.insert(Shipments).values({ ...row, uuid: crypto.randomUUID() });
+    const uuid = crypto.randomUUID();
+    await db.insert(Shipments).values({ ...row, uuid });
+    await db
+      .insert(ShipmentCargoLines)
+      .values({ ...cargo, uuid: crypto.randomUUID(), shipmentUuid: uuid, position: 0 });
     inserted += 1;
   }
   console.log(`Imported ${inserted} shipments, skipped ${skipped} already present.`);

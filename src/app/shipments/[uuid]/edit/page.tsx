@@ -28,7 +28,12 @@ const EditShipmentPage = async ({ params, searchParams }: Props) => {
       {documents === "failed" && (
         <FormError message="The shipment was created, but some documents did not upload. Add them again below and save." />
       )}
-      <ShipmentForm mode="edit" shipment={detail.shipment} documents={detail.documents} />
+      <ShipmentForm
+        mode="edit"
+        shipment={detail.shipment}
+        cargoLines={detail.cargoLines}
+        documents={detail.documents}
+      />
     </div>
   );
 };

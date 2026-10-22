@@ -55,7 +55,6 @@ export type TrackingNumberType = (typeof trackingNumberTypes)[number];
 export const containerSizes = [
   "20",
   "40",
-  "45",
 ] as const satisfies readonly string[];
 
 export type ContainerSize = (typeof containerSizes)[number];

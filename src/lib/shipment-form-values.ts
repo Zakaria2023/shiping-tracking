@@ -1,7 +1,15 @@
+import { SelectShipmentCargoLines } from "@/db/schema/shipment-cargo-lines";
 import { SelectShipments } from "@/db/schema/shipments";
-import { ShipmentFields } from "@/services/shipments";
+import { CargoLineFields, ShipmentFields } from "@/services/shipments";
 import { parseIsoDate, toIsoDate } from "@/utils";
-import { ShipmentFormValues } from "@/validators/shipment";
+import { CargoLineFormValues, ShipmentFormValues } from "@/validators/shipment";
+
+export const EMPTY_CARGO_LINE: CargoLineFormValues = {
+  grossWeightKg: "",
+  containerCount: "",
+  containerSize: "",
+  price: "",
+};
 
 /** What the form starts with for a new shipment. */
 export const EMPTY_SHIPMENT_FORM: ShipmentFormValues = {
@@ -17,20 +25,28 @@ export const EMPTY_SHIPMENT_FORM: ShipmentFormValues = {
   loadingCountry: "",
   portOfDischarge: "",
   dischargeCountry: "",
-  grossWeightKg: "",
-  containerCount: "",
-  containerSize: "",
-  price: "",
+  cargoLines: [EMPTY_CARGO_LINE],
   priceCurrency: "USD",
   etd: "",
   eta: "",
   status: "pending",
   currentLocation: "",
+  nextLocation: "",
   notes: "",
 };
 
-/** A saved row, as the form fields. */
-export const toShipmentFormValues = (shipment: SelectShipments): ShipmentFormValues => ({
+const toCargoLineFormValues = (line: SelectShipmentCargoLines): CargoLineFormValues => ({
+  grossWeightKg: line.grossWeightKg ? String(Number(line.grossWeightKg)) : "",
+  containerCount: line.containerCount ? String(line.containerCount) : "",
+  containerSize: line.containerSize ?? "",
+  price: line.price ? String(Number(line.price)) : "",
+});
+
+/** A saved row and its cargo lines, as the form fields. */
+export const toShipmentFormValues = (
+  shipment: SelectShipments,
+  cargoLines: SelectShipmentCargoLines[],
+): ShipmentFormValues => ({
   customerName: shipment.customerName ?? "",
   kind: shipment.kind,
   carrier: shipment.carrier,
@@ -43,15 +59,14 @@ export const toShipmentFormValues = (shipment: SelectShipments): ShipmentFormVal
   loadingCountry: shipment.loadingCountry,
   portOfDischarge: shipment.portOfDischarge,
   dischargeCountry: shipment.dischargeCountry,
-  grossWeightKg: shipment.grossWeightKg ? String(Number(shipment.grossWeightKg)) : "",
-  containerCount: shipment.containerCount ? String(shipment.containerCount) : "",
-  containerSize: shipment.containerSize ?? "",
-  price: shipment.price ? String(Number(shipment.price)) : "",
+  // The form always shows at least one line to fill in.
+  cargoLines: cargoLines.length ? cargoLines.map(toCargoLineFormValues) : [EMPTY_CARGO_LINE],
   priceCurrency: shipment.priceCurrency,
   etd: toIsoDate(shipment.etd),
   eta: toIsoDate(shipment.eta),
   status: shipment.status,
   currentLocation: shipment.currentLocation ?? "",
+  nextLocation: shipment.nextLocation ?? "",
   notes: shipment.notes ?? "",
 });
 
@@ -74,15 +89,32 @@ export const toShipmentFields = (values: ShipmentFormValues): ShipmentFields => 
   loadingCountry: values.loadingCountry.toUpperCase(),
   portOfDischarge: values.portOfDischarge.trim(),
   dischargeCountry: values.dischargeCountry.toUpperCase(),
-  grossWeightKg: blankToNull(values.grossWeightKg),
-  containerCount: values.containerCount ? Number(values.containerCount) : null,
-  containerSize: values.containerSize ? values.containerSize : null,
-  price: blankToNull(values.price),
   priceCurrency: values.priceCurrency,
   etd: parseIsoDate(values.etd),
   eta: parseIsoDate(values.eta),
   status: values.status,
   statusLocked: false,
   currentLocation: blankToNull(values.currentLocation),
+  nextLocation: values.kind === "bulk" ? blankToNull(values.nextLocation) : null,
   notes: blankToNull(values.notes),
 });
+
+/** The filled-in cargo lines; a bulk ship carries no containers. */
+export const toCargoLineFields = (values: ShipmentFormValues): CargoLineFields[] =>
+  values.cargoLines
+    .map((line) => {
+      const isBulk = values.kind === "bulk";
+      return {
+        grossWeightKg: blankToNull(line.grossWeightKg),
+        containerCount: !isBulk && line.containerCount ? Number(line.containerCount) : null,
+        containerSize: !isBulk && line.containerSize ? line.containerSize : null,
+        price: blankToNull(line.price),
+      };
+    })
+    .filter(
+      (line) =>
+        line.grossWeightKg !== null ||
+        line.containerCount !== null ||
+        line.containerSize !== null ||
+        line.price !== null,
+    );

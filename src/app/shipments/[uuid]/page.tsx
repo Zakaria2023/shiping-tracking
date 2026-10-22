@@ -24,7 +24,7 @@ const ShipmentPage = async ({ params }: Props) => {
   if (!detail) {
     notFound();
   }
-  const { shipment, containers, events, documents } = detail;
+  const { shipment, cargoLines, containers, events, documents } = detail;
   const carrierUrl = carrierTrackingUrl(
     shipment.carrier,
     shipment.trackingNumber,
@@ -86,7 +86,7 @@ const ShipmentPage = async ({ params }: Props) => {
           {containers.length > 0 && <ContainersList containers={containers} />}
         </div>
         <div className="flex flex-col gap-5 lg:sticky lg:top-6 lg:self-start">
-          <ShipmentSummary shipment={shipment} />
+          <ShipmentSummary shipment={shipment} cargoLines={cargoLines} />
           <DocumentsList shipmentUuid={shipment.uuid} documents={documents} />
           <StatusEditor shipment={shipment} />
           {shipment.carrier === "msc" && <MscPasteForm uuid={shipment.uuid} />}

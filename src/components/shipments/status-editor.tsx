@@ -55,6 +55,11 @@ export const StatusEditor = ({ shipment }: StatusEditorProps) => {
         <Field label="Current location" error={errors.currentLocation?.message}>
           <Input {...register("currentLocation")} placeholder="Suez Canal" />
         </Field>
+        {shipment.kind === "bulk" && (
+          <Field label="Next location" error={errors.nextLocation?.message}>
+            <Input {...register("nextLocation")} placeholder="Port Said" />
+          </Field>
+        )}
         {tracked && (
           <label className="flex items-center gap-2 text-sm text-muted">
             <input type="checkbox" {...register("locked")} className="h-4 w-4 accent-primary" />

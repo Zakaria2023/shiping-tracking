@@ -48,7 +48,6 @@ export const TRACKING_NUMBER_TYPE_LABELS: Record<TrackingNumberType, string> = {
 export const CONTAINER_SIZE_LABELS: Record<ContainerSize, string> = {
   "20": "20 ft",
   "40": "40 ft",
-  "45": "45 ft",
 };
 
 export const TRACKING_SOURCE_LABELS: Record<TrackingSource, string> = {

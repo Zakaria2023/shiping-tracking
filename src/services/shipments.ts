@@ -1,12 +1,15 @@
-import { and, asc, count, desc, eq, like, or, SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, like, or, SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { Carrier, ShipmentKind, ShipmentStatus } from "@/db/enum";
 import {
+  InsertShipmentCargoLines,
   InsertShipments,
+  SelectShipmentCargoLines,
   SelectShipmentContainers,
   SelectShipmentDocuments,
   SelectShipments,
   SelectTrackingEvents,
+  ShipmentCargoLines,
   ShipmentContainers,
   ShipmentDocuments,
   Shipments,
@@ -15,7 +18,12 @@ import {
 import { buildPaginatedResult, generateUuid, ListParams, PaginatedResult, resolvePagination } from "@/utils";
 import { deleteObjects } from "./storage";
 
-export type { SelectShipments, SelectShipmentContainers, SelectTrackingEvents };
+export type {
+  SelectShipments,
+  SelectShipmentCargoLines,
+  SelectShipmentContainers,
+  SelectTrackingEvents,
+};
 
 export type ShipmentFilters = ListParams & {
   status?: ShipmentStatus;
@@ -38,8 +46,18 @@ export type ShipmentFields = Omit<
   | "trackingError"
 >;
 
+/** One cargo line as the form saves it; its owner and position are set here. */
+export type CargoLineFields = Pick<
+  InsertShipmentCargoLines,
+  "grossWeightKg" | "containerCount" | "containerSize" | "price"
+>;
+
+/** A shipment with its cargo lines, in the order they were entered. */
+export type ShipmentWithCargo = SelectShipments & { cargoLines: SelectShipmentCargoLines[] };
+
 export type ShipmentDetail = {
   shipment: SelectShipments;
+  cargoLines: SelectShipmentCargoLines[];
   containers: SelectShipmentContainers[];
   events: SelectTrackingEvents[];
   documents: SelectShipmentDocuments[];
@@ -78,10 +96,25 @@ const filtersToWhere = (filters: ShipmentFilters): SQL | undefined =>
       : undefined,
   );
 
+const cargoLinesOf = (shipmentUuids: string[]): Promise<SelectShipmentCargoLines[]> =>
+  shipmentUuids.length
+    ? db
+        .select()
+        .from(ShipmentCargoLines)
+        .where(inArray(ShipmentCargoLines.shipmentUuid, shipmentUuids))
+        .orderBy(asc(ShipmentCargoLines.position), asc(ShipmentCargoLines.id))
+    : Promise.resolve([]);
+
+const cargoLineRows = (
+  shipmentUuid: string,
+  lines: CargoLineFields[],
+): InsertShipmentCargoLines[] =>
+  lines.map((line, position) => ({ ...line, uuid: generateUuid(), shipmentUuid, position }));
+
 /** A filtered, paginated page of shipments, soonest ETA first. */
 export const getShipmentsPage = async (
   filters: ShipmentFilters = {},
-): Promise<PaginatedResult<SelectShipments>> => {
+): Promise<PaginatedResult<ShipmentWithCargo>> => {
   const { page, pageSize, offset } = resolvePagination(filters.page, filters.pageSize);
   const where = filtersToWhere(filters);
 
@@ -102,7 +135,12 @@ export const getShipmentsPage = async (
     db.select({ total: count() }).from(Shipments).where(where),
   ]);
 
-  return buildPaginatedResult(rows, Number(totals?.total ?? 0), page, pageSize);
+  const lines = await cargoLinesOf(rows.map((row) => row.uuid));
+  const items = rows.map((row) => ({
+    ...row,
+    cargoLines: lines.filter((line) => line.shipmentUuid === row.uuid),
+  }));
+  return buildPaginatedResult(items, Number(totals?.total ?? 0), page, pageSize);
 };
 
 export const getShipment = async (uuid: string): Promise<ShipmentDetail | null> => {
@@ -110,7 +148,8 @@ export const getShipment = async (uuid: string): Promise<ShipmentDetail | null> 
   if (!shipment) {
     return null;
   }
-  const [containers, events, documents] = await Promise.all([
+  const [cargoLines, containers, events, documents] = await Promise.all([
+    cargoLinesOf([uuid]),
     db
       .select()
       .from(ShipmentContainers)
@@ -127,12 +166,20 @@ export const getShipment = async (uuid: string): Promise<ShipmentDetail | null> 
       .where(eq(ShipmentDocuments.shipmentUuid, uuid))
       .orderBy(asc(ShipmentDocuments.createdAt), asc(ShipmentDocuments.id)),
   ]);
-  return { shipment, containers, events, documents };
+  return { shipment, cargoLines, containers, events, documents };
 };
 
-export const createShipment = async (fields: ShipmentFields): Promise<string> => {
+export const createShipment = async (
+  fields: ShipmentFields,
+  cargoLines: CargoLineFields[],
+): Promise<string> => {
   const uuid = generateUuid();
-  await db.insert(Shipments).values({ ...fields, uuid });
+  await db.transaction(async (tx) => {
+    await tx.insert(Shipments).values({ ...fields, uuid });
+    if (cargoLines.length) {
+      await tx.insert(ShipmentCargoLines).values(cargoLineRows(uuid, cargoLines));
+    }
+  });
   return uuid;
 };
 
@@ -143,6 +190,7 @@ export const createShipment = async (fields: ShipmentFields): Promise<string> =>
 export const updateShipment = async (
   uuid: string,
   fields: ShipmentFields,
+  cargoLines: CargoLineFields[],
 ): Promise<{ needsTracking: boolean }> => {
   const [before] = await db
     .select({
@@ -156,11 +204,18 @@ export const updateShipment = async (
     !before ||
     before.carrier !== fields.carrier ||
     before.trackingNumber !== (fields.trackingNumber ?? null);
-  await db
-    .update(Shipments)
-    // A tracking error belongs to the old line and number; it says nothing about the new ones.
-    .set(identityChanged ? { ...fields, trackingError: null } : fields)
-    .where(eq(Shipments.uuid, uuid));
+  await db.transaction(async (tx) => {
+    await tx
+      .update(Shipments)
+      // A tracking error belongs to the old line and number; it says nothing about the new ones.
+      .set(identityChanged ? { ...fields, trackingError: null } : fields)
+      .where(eq(Shipments.uuid, uuid));
+    // The form sends every line, so its list replaces the saved one.
+    await tx.delete(ShipmentCargoLines).where(eq(ShipmentCargoLines.shipmentUuid, uuid));
+    if (cargoLines.length) {
+      await tx.insert(ShipmentCargoLines).values(cargoLineRows(uuid, cargoLines));
+    }
+  });
   return { needsTracking: identityChanged || before.lastTrackedAt === null };
 };
 
@@ -184,6 +239,7 @@ export const setShipmentStatus = async (
   uuid: string,
   status: ShipmentStatus,
   currentLocation: string | null,
+  nextLocation: string | null,
   locked: boolean,
 ): Promise<void> => {
   await db
@@ -192,6 +248,7 @@ export const setShipmentStatus = async (
       status,
       statusLocked: locked,
       currentLocation: currentLocation ?? undefined,
+      nextLocation,
       lastTrackedAt: new Date(),
       lastTrackedSource: "manual",
     })

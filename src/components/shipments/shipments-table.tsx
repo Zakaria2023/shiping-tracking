@@ -2,18 +2,20 @@ import { ArrowRight, CircleAlert, Lock, Pencil } from "lucide-react";
 import Link from "next/link";
 import { DeleteShipmentButton } from "@/components/shipments/delete-shipment-button";
 import { StatusPill } from "@/components/ui/status-pill";
-import { SelectShipments } from "@/db/schema/shipments";
 import {
   carrierLabel,
   containerSummary,
   formatPrice,
   formatWeight,
   shipmentTitle,
+  totalPrice,
+  totalWeightKg,
 } from "@/lib/shipment-display";
+import { ShipmentWithCargo } from "@/services/shipments";
 import { countryName, formatDate, formatDateTime, relativeDays } from "@/utils";
 
 type ShipmentsTableProps = {
-  shipments: SelectShipments[];
+  shipments: ShipmentWithCargo[];
 };
 
 const HEAD_CLASS = "px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-muted";
@@ -75,11 +77,11 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
               </p>
             </td>
             <td className={CELL_CLASS}>
-              <p className="text-ink">{containerSummary(shipment) || "—"}</p>
-              <p className="text-xs text-muted">{formatWeight(shipment.grossWeightKg)}</p>
+              <p className="text-ink">{containerSummary(shipment.cargoLines) || "—"}</p>
+              <p className="text-xs text-muted">{formatWeight(totalWeightKg(shipment.cargoLines))}</p>
             </td>
             <td className={`${CELL_CLASS} tabular whitespace-nowrap text-ink`}>
-              {formatPrice(shipment)}
+              {formatPrice(totalPrice(shipment.cargoLines), shipment.priceCurrency)}
             </td>
             <td className={`${CELL_CLASS} tabular whitespace-nowrap text-ink`}>
               {formatDate(shipment.etd) || "—"}
@@ -92,8 +94,12 @@ export const ShipmentsTable = ({ shipments }: ShipmentsTableProps) => (
             </td>
             <td className={CELL_CLASS}>
               <p className="text-ink">{shipment.currentLocation || "—"}</p>
-              {shipment.lastEventDescription && (
+              {shipment.lastEventDescription ? (
                 <p className="line-clamp-1 text-xs text-muted">{shipment.lastEventDescription}</p>
+              ) : (
+                shipment.nextLocation && (
+                  <p className="line-clamp-1 text-xs text-muted">Next: {shipment.nextLocation}</p>
+                )
               )}
             </td>
             <td className={`${CELL_CLASS} whitespace-nowrap text-muted`}>

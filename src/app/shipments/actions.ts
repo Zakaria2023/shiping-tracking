@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { CARRIER_LABELS } from "@/db/label";
-import { toShipmentFields } from "@/lib/shipment-form-values";
+import { toCargoLineFields, toShipmentFields } from "@/lib/shipment-form-values";
 import {
   createShipment,
   deleteShipment,
@@ -60,7 +60,7 @@ export const createShipmentAction = async (
   const fields = toShipmentFields(parsed.data);
   let uuid: string;
   try {
-    uuid = await createShipment(fields);
+    uuid = await createShipment(fields, toCargoLineFields(parsed.data));
   } catch (error) {
     return fail(error, "Failed to create the shipment");
   }
@@ -84,7 +84,7 @@ export const updateShipmentAction = async (
   void _ignored;
   let needsTracking: boolean;
   try {
-    ({ needsTracking } = await updateShipment(uuid, fields));
+    ({ needsTracking } = await updateShipment(uuid, fields, toCargoLineFields(parsed.data)));
   } catch (error) {
     return fail(error, "Failed to save the shipment");
   }
@@ -176,6 +176,7 @@ export const setStatusAction = async (
       uuid,
       parsed.data.status,
       parsed.data.currentLocation?.trim() || null,
+      parsed.data.nextLocation?.trim() || null,
       parsed.data.locked,
     );
   } catch (error) {

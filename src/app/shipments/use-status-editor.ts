@@ -23,6 +23,7 @@ export const useStatusEditor = (shipment: SelectShipments) => {
     defaultValues: {
       status: shipment.status,
       currentLocation: shipment.currentLocation ?? "",
+      nextLocation: shipment.nextLocation ?? "",
       // A tracked shipment keeps following the carrier unless asked not to;
       // an untracked one is always by hand, so the lock means nothing there.
       locked: shipment.statusLocked,
